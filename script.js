@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const personalSection = document.getElementById('personalSection');
     const groupSection = document.getElementById('groupSection');
     const addAssetButton = document.getElementById('addAssetButton');
-    const addHeirButton = document.getElementById('addHeirButton');
     const assetContainer = document.getElementById('assetContainer');
+    const addHeirButton = document.getElementById('addHeirButton');
     const heirContainer = document.getElementById('heirContainer');
     const calculateButton = document.getElementById('calculateButton');
     const result = document.getElementById('result');
@@ -20,7 +20,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 재산 추가 버튼
+    // 숫자 입력 필드에 콤마 추가 함수
+    function formatNumberWithCommas(value) {
+        const numericValue = value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
+        return parseInt(numericValue || '0', 10).toLocaleString();
+    }
+
+    // 금액 필드 이벤트 리스너 추가 함수
+    function addCommaFormatting(inputField) {
+        inputField.addEventListener('input', () => {
+            const formattedValue = formatNumberWithCommas(inputField.value);
+            inputField.value = formattedValue;
+        });
+    }
+
+    // 재산 유형 선택 시 필드 업데이트
+    function updateAssetFields(assetType, container) {
+        const cashField = container.querySelector('.cashField');
+        const realEstateField = container.querySelector('.realEstateField');
+        const stockQuantityField = container.querySelector('.stockQuantityField');
+        const stockPriceField = container.querySelector('.stockPriceField');
+        const othersField = container.querySelector('.othersField');
+
+        cashField.style.display = 'none';
+        realEstateField.style.display = 'none';
+        stockQuantityField.style.display = 'none';
+        stockPriceField.style.display = 'none';
+        othersField.style.display = 'none';
+
+        if (assetType === 'cash') {
+            cashField.style.display = 'block';
+            addCommaFormatting(cashField); // 콤마 추가
+        } else if (assetType === 'realEstate') {
+            realEstateField.style.display = 'block';
+            addCommaFormatting(realEstateField); // 콤마 추가
+        } else if (assetType === 'stock') {
+            stockQuantityField.style.display = 'block';
+            stockPriceField.style.display = 'block';
+            addCommaFormatting(stockPriceField); // 콤마 추가
+        } else if (assetType === 'others') {
+            othersField.style.display = 'block';
+            addCommaFormatting(othersField); // 콤마 추가
+        }
+    }
+
+    // 재산 추가 버튼 이벤트
     addAssetButton.addEventListener('click', () => {
         const newAsset = document.createElement('div');
         newAsset.className = 'asset-entry';
@@ -47,6 +91,17 @@ document.addEventListener('DOMContentLoaded', () => {
         newAssetType.addEventListener('change', (event) => {
             updateAssetFields(event.target.value, newAsset);
         });
+
+        // 콤마 추가 이벤트 등록
+        const cashField = newAsset.querySelector('.cashField');
+        const realEstateField = newAsset.querySelector('.realEstateField');
+        const stockPriceField = newAsset.querySelector('.stockPriceField');
+        const othersField = newAsset.querySelector('.othersField');
+
+        addCommaFormatting(cashField);
+        addCommaFormatting(realEstateField);
+        addCommaFormatting(stockPriceField);
+        addCommaFormatting(othersField);
     });
 
     // 초기화: 기존 재산 항목에 필드 변경 이벤트 추가
@@ -54,11 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.target.classList.contains('assetType')) {
             const assetType = event.target.value;
             const parentContainer = event.target.closest('.asset-entry');
-            updateAssetFields(assetType, parentContainer); // 필드 변경 로직 호출
+            updateAssetFields(assetType, parentContainer);
         }
     });
 
-    // 상속인 추가 버튼
+    // 상속인 추가 버튼 이벤트
     addHeirButton.addEventListener('click', () => {
         const newHeir = document.createElement('div');
         newHeir.className = 'heir-entry';
@@ -74,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         heirContainer.appendChild(newHeir);
     });
 
-    // 계산하기 버튼
+       // 계산하기 버튼
     calculateButton.addEventListener('click', () => {
         const assets = Array.from(document.querySelectorAll('.asset-entry')).map(asset => {
             const type = asset.querySelector('.assetType').value;
