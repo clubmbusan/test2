@@ -9,35 +9,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const calculateButton = document.getElementById('calculateButton');
     const result = document.getElementById('result');
 
-    // 콤마 추가 함수
-    function formatNumberWithCommas(value) {
-        const numericValue = value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
-        return parseInt(numericValue || '0', 10).toLocaleString();
-    }
+   // 숫자에 콤마를 추가하는 함수
+function formatNumberWithCommas(value) {
+    const numericValue = value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
+    return parseInt(numericValue || '0', 10).toLocaleString(); // 콤마 추가
+}
 
-    // 입력 필드에 콤마 추가
-    function addCommaFormatting(inputField) {
-        inputField.addEventListener('input', () => {
-            inputField.value = formatNumberWithCommas(inputField.value);
-        });
-    }
-   
-    // 상속 유형에 따른 섹션 표시/숨김
-    inheritanceType.addEventListener('change', () => {
-        if (inheritanceType.value === 'personal') {
-            personalSection.style.display = 'block';
-            groupSection.style.display = 'none';
-        } else {
-            personalSection.style.display = 'none';
-            groupSection.style.display = 'block';
+// 입력 필드에 콤마 추가 이벤트 등록 함수
+function addCommaFormatting(inputField) {
+    inputField.addEventListener('input', () => {
+        const numericValue = inputField.value.replace(/,/g, ''); // 기존 콤마 제거
+        if (!isNaN(numericValue)) {
+            inputField.value = parseInt(numericValue || '0', 10).toLocaleString(); // 콤마 추가
         }
     });
+}
 
-    // 숫자 입력 필드에 콤마 추가 함수
-    function formatNumberWithCommas(value) {
-        const numericValue = value.replace(/[^0-9]/g, ''); // 숫자 외 문자 제거
-        return parseInt(numericValue || '0', 10).toLocaleString();
-    }
+// DOMContentLoaded 이후 모든 입력 필드에 콤마 추가
+document.addEventListener('DOMContentLoaded', () => {
+    // 모든 assetValue 클래스를 가진 입력 필드 선택
+    const allFields = document.querySelectorAll('.assetValue');
+
+    // 각 필드에 콤마 추가 이벤트 등록
+    allFields.forEach(addCommaFormatting);
+
+    // 재산 추가 버튼 클릭 시 동적 필드 생성 및 콤마 이벤트 등록
+    addAssetButton.addEventListener('click', () => {
+        const newField = document.createElement('input');
+        newField.type = 'text';
+        newField.className = 'assetValue'; // assetValue 클래스를 추가
+        newField.placeholder = '금액 (원)';
+        assetContainer.appendChild(newField);
+
+        // 새로 추가된 필드에 콤마 추가 이벤트 등록
+        addCommaFormatting(newField);
+    });
+});
 
     // 금액 필드 이벤트 리스너 추가 함수
     function addCommaFormatting(inputField) {
@@ -196,9 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (relationship === 'adultChild') {
             exemption += 50000000; // 성년 자녀 공제
         } else if (relationship === 'minorChild') {
-            const fixedAge = 10; // 미성년자 고정 나이 설정
-            const ageAdjustment = Math.max(0, 20 - fixedAge); // 20 - 고정 나이
-            exemption += 20000000 * ageAdjustment; // 미성년 추가 공제
+            exemption += 20000000; // 미성년 자녀 고정 공제
         } else if (relationship === 'parent') {
             exemption += 50000000; // 부모 공제
         } else if (relationship === 'sibling') {
@@ -224,22 +229,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = heir.querySelector('input[type="text"]').value;
             const relationship = heir.querySelector('select').value;
             const share = parseFloat(heir.querySelector('input[type="number"]').value) || 0;
-            return { name, relationship, share };
-        });
-
-        const totalShare = heirs.reduce((sum, heir) => sum + heir.share, 0);
-        if (totalShare > 100) {
-            result.innerHTML = `<p style="color: red;">상속 비율 합계가 100%를 초과할 수 없습니다.</p>`;
-            return;
-        }
-
-        const heirResults = heirs.map(heir => {
-            const heirAssetValue = (totalAssetValue * heir.share) / 100;
+            const heirAssetValue = (totalAssetValue * share) / 100;
             let exemption = 500000000; // 기본 공제
-            if (heir.relationship === 'spouse') {
+
+            // 관계에 따른 추가 공제
+            if (relationship === 'spouse') {
                 exemption += 3000000000; // 배우자 공제
-            } else if (heir.relationship === 'child') {
-                exemption += 50000000; // 자녀 공제
+            } else if (relationship === 'adultChild') {
+                exemption += 50000000; // 성년 자녀 공제
+            } else if (relationship === 'minorChild') {
+                exemption += 20000000; // 미성년 자녀 고정 공제
+            } else if (relationship === 'parent') {
+                exemption += 50000000; // 부모 공제
+            } else if (relationship === 'sibling') {
+                exemption += 50000000; // 형제자매 공제
             } else {
                 exemption += 10000000; // 기타 공제
             }
@@ -248,8 +251,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const tax = calculateTax(taxableAmount);
 
             return {
-                name: heir.name,
-                share: heir.share,
+                name,
+                share,
                 assetValue: heirAssetValue,
                 exemption,
                 taxableAmount,
@@ -259,6 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         result.innerHTML = `
             <h3>계산 결과 (전체분)</h3>
+            총 상속 금액: ${totalAssetValue.toLocaleString()} 원
             ${heirResults.map(r => `
                 <p>
                     <strong>${r.name}</strong><br>
@@ -292,5 +296,4 @@ function calculateTax(taxableAmount) {
     }
     return Math.max(totalTax, 0);
 }
-
 });
