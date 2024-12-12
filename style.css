@@ -128,3 +128,61 @@ h2 {
         width: 100%;
     }
 }
+/* 재산 유형 필드 초기 숨김 설정 */
+.cashField,
+.realEstateField,
+.stockQuantityField,
+.stockPriceField,
+.stockTotalField,
+.othersField {
+    display: none; /* 기본적으로 숨김 */
+}
+
+/* JavaScript에서 display 속성을 변경하면 적용 */
+.cashField[style*="display: block"],
+.realEstateField[style*="display: block"],
+.stockQuantityField[style*="display: block"],
+.stockPriceField[style*="display: block"],
+.stockTotalField[style*="display: block"],
+.othersField[style*="display: block"] {
+    display: block !important;
+}
+@keyframes gentleBlink {
+    0%, 100% {
+        background-color: #2196F3; /* 기본 파란색 */
+        color: white;
+        box-shadow: 0 0 5px rgba(33, 150, 243, 0.2); /* 은은한 파란빛 */
+    }
+    50% {
+        background-color: #64B5F6; /* 밝은 파란색 */
+        color: white;
+        box-shadow: 0 0 10px rgba(100, 181, 246, 0.6); /* 밝은 파란빛 */
+    }
+}
+
+/* 기본 상태: 작게 */
+#inheritanceType {
+    animation: gentleBlink 2.5s infinite; /* 애니메이션 설정 */
+    border-radius: 5px; /* 둥근 모서리 */
+    padding: 5px 10px; /* 작게 설정 */
+    font-size: 14px; /* 글자 크기 작게 */
+    font-weight: bold; /* 강조된 글꼴 */
+    cursor: pointer; /* 마우스 포인터 변경 */
+    transition: all 0.3s ease; /* 부드러운 전환 효과 */
+    border: 2px solid #2196F3; /* 파란 테두리 */
+}
+
+/* 클릭 시 확대 */
+#inheritanceType:focus {
+    padding: 10px 15px; /* 커지게 설정 */
+    font-size: 16px; /* 글자 크기 확대 */
+    border: 3px solid #64B5F6; /* 밝은 파란 테두리 */
+    box-shadow: 0 0 15px rgba(100, 181, 246, 0.8); /* 빛나는 파란 효과 */
+}
+
+/* 포커스가 사라지면 원래 크기로 복귀 */
+#inheritanceType:not(:focus) {
+    padding: 5px 10px; /* 원래 크기로 복귀 */
+    font-size: 14px;
+    box-shadow: none;
+}
