@@ -24,54 +24,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-     // 재산 유형에 따라 필드를 표시/숨김
-    function updateAssetFields(assetType, container) {
-        const cashField = container.querySelector('.cashField');
-        const realEstateField = container.querySelector('.realEstateField');
-        const stockQuantityField = container.querySelector('.stockQuantityField');
-        const stockPriceField = container.querySelector('.stockPriceField');
-        const stockTotalField = container.querySelector('.stockTotalField');
-        const othersField = container.querySelector('.othersField');
-
-        // 모든 필드 숨기기
-        cashField.style.display = 'none';
-        realEstateField.style.display = 'none';
-        stockQuantityField.style.display = 'none';
-        stockPriceField.style.display = 'none';
-        stockTotalField.style.display = 'none';
-        othersField.style.display = 'none';
-
-        // 선택된 재산 유형에 따라 필드 표시
-        if (assetType === 'cash') {
-            cashField.style.display = 'block';
-        } else if (assetType === 'realEstate') {
-            realEstateField.style.display = 'block';
-        } else if (assetType === 'stock') {
-            stockQuantityField.style.display = 'block';
-            stockPriceField.style.display = 'block';
-            stockTotalField.style.display = 'block';
-        } else if (assetType === 'others') {
-            othersField.style.display = 'block';
-        }
-    }
-    
     // 초기화: 모든 .assetValue 필드에 이벤트 등록
     document.querySelectorAll('.assetValue').forEach(addCommaFormatting);
-
-    // 상단 드롭다운 이벤트 추가
-     const topAssetTypeSelect = document.querySelector('.topAssetType'); // 상단 드롭다운 클래스/ID
-     const topAssetContainer = document.querySelector('.topAssetContainer'); // 상단 입력 필드 컨테이너
-     if (topAssetTypeSelect) {
-        topAssetTypeSelect.addEventListener('change', () => {
-            updateAssetFields(topAssetTypeSelect.value, topAssetContainer);
-         });
-     }
 
     // 재산 항목 생성
     function createAssetEntry() {
         const newAsset = document.createElement('div');
         newAsset.className = 'asset-entry';
-        newAsset.innerHTML = 
+        newAsset.innerHTML = `
             <label>재산 유형:</label>
             <select class="assetType">
                 <option value="cash">현금</option>
@@ -87,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <input type="text" class="stockTotalField assetValue" placeholder="금액 (원)" style="display: none;" readonly>
                 <input type="text" class="othersField assetValue" placeholder="금액 (원)" style="display: none;">
             </div>
-        ;
+        `;
         assetContainer.appendChild(newAsset);
 
         // 추가 필드에 이벤트 등록
@@ -95,11 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
         addCommaFormatting(newAsset.querySelector('.realEstateField'));
         addCommaFormatting(newAsset.querySelector('.othersField'));
 
-        // 재산 유형 선택 이벤트
-        const assetTypeSelect = newAsset.querySelector('.assetType');
-        assetTypeSelect.addEventListener('change', () => {
-            updateAssetFields(assetTypeSelect.value, newAsset);
-        });
         // 주식 계산 로직
         const stockQuantityField = newAsset.querySelector('.stockQuantityField');
         const stockPriceField = newAsset.querySelector('.stockPriceField');
@@ -121,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     addHeirButton.addEventListener('click', () => {
         const newHeir = document.createElement('div');
         newHeir.className = 'heir-entry';
-        newHeir.innerHTML = 
+        newHeir.innerHTML = `
             <input type="text" placeholder="이름">
             <select>
                 <option value="spouse">배우자</option>
@@ -132,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <option value="other">기타</option>
             </select>
             <input type="number" placeholder="상속 비율 (%)">
-        ;
+        `;
         heirContainer.appendChild(newHeir);
     });
 
@@ -173,13 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const taxableAmount = Math.max(totalAssetValue - exemption, 0);
         const tax = calculateTax(taxableAmount);
 
-        result.innerHTML = 
+        result.innerHTML = `
             <h3>계산 결과 (개인 모드)</h3>
             <p>총 재산 금액: ${formatNumberWithCommas(totalAssetValue.toString())} 원</p>
             <p>공제 금액: ${formatNumberWithCommas(exemption.toString())} 원</p>
             <p>과세 금액: ${formatNumberWithCommas(taxableAmount.toString())} 원</p>
             <p>상속세: ${formatNumberWithCommas(tax.toString())} 원</p>
-        ;
+        `;
     }
 
     // 전체 모드 계산
@@ -202,17 +157,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return { name, share, assetValue: heirAssetValue, exemption, taxableAmount, tax };
         });
 
-        result.innerHTML = 
+        result.innerHTML = `
             <h3>계산 결과 (전체 모드)</h3>
-            ${heirs.map(heir => 
+            ${heirs.map(heir => `
                 <p>
                     <strong>${heir.name}</strong>: ${formatNumberWithCommas(heir.assetValue.toString())} 원<br>
                     공제 금액: ${formatNumberWithCommas(heir.exemption.toString())} 원<br>
                     과세 금액: ${formatNumberWithCommas(heir.taxableAmount.toString())} 원<br>
                     상속세: ${formatNumberWithCommas(heir.tax.toString())} 원
                 </p>
-            ).join('')}
-        ;
+            `).join('')}
+        `;
     }
 
     // 상속세 계산 함수
