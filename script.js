@@ -9,6 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const calculateButton = document.getElementById('calculateButton');
     const result = document.getElementById('result');
 
+    // 초기화: 모든 .assetValue 필드에 이벤트 등록
+    document.querySelectorAll('.assetValue').forEach(addCommaFormatting);
+
+    // 초기화: 모든 .assetType 필드에 이벤트 등록
+    document.querySelectorAll('.assetType').forEach(select => {
+        select.addEventListener('change', () => handleAssetTypeChange(select));
+    });
+
     // 숫자에 콤마를 추가하는 함수
     function formatNumberWithCommas(value) {
         return parseInt(value.replace(/[^0-9]/g, '') || '0', 10).toLocaleString();
@@ -24,8 +32,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 초기화: 모든 .assetValue 필드에 이벤트 등록
-    document.querySelectorAll('.assetValue').forEach(addCommaFormatting);
+    // 재산 유형에 따라 필드를 동적으로 표시
+    function handleAssetTypeChange(assetTypeSelect) {
+        const assetFields = assetTypeSelect.closest('.asset-entry').querySelector('.assetFields');
+        const cashField = assetFields.querySelector('.cashField');
+        const realEstateField = assetFields.querySelector('.realEstateField');
+        const stockQuantityField = assetFields.querySelector('.stockQuantityField');
+        const stockPriceField = assetFields.querySelector('.stockPriceField');
+        const stockTotalField = assetFields.querySelector('.stockTotalField');
+        const othersField = assetFields.querySelector('.othersField');
+
+        // 모든 필드 숨기기
+        cashField.style.display = 'none';
+        realEstateField.style.display = 'none';
+        stockQuantityField.style.display = 'none';
+        stockPriceField.style.display = 'none';
+        stockTotalField.style.display = 'none';
+        othersField.style.display = 'none';
+
+        // 선택된 유형에 따라 표시
+        switch (assetTypeSelect.value) {
+            case 'cash':
+                cashField.style.display = 'block';
+                break;
+            case 'realEstate':
+                realEstateField.style.display = 'block';
+                break;
+            case 'stock':
+                stockQuantityField.style.display = 'block';
+                stockPriceField.style.display = 'block';
+                stockTotalField.style.display = 'block';
+                break;
+            case 'others':
+                othersField.style.display = 'block';
+                break;
+        }
+    }
 
     // 재산 항목 생성
     function createAssetEntry() {
@@ -50,7 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         assetContainer.appendChild(newAsset);
 
-        // 추가 필드에 이벤트 등록
+        const assetTypeSelect = newAsset.querySelector('.assetType');
+        assetTypeSelect.addEventListener('change', () => handleAssetTypeChange(assetTypeSelect));
+
+        // 콤마 이벤트 등록
         addCommaFormatting(newAsset.querySelector('.cashField'));
         addCommaFormatting(newAsset.querySelector('.realEstateField'));
         addCommaFormatting(newAsset.querySelector('.othersField'));
@@ -69,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 재산 추가 버튼 이벤트
+        // 재산 추가 버튼 이벤트
     addAssetButton.addEventListener('click', createAssetEntry);
 
     // 상속인 항목 생성
@@ -116,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 개인 모드 계산
+    // 개인 모드 계산 함수
     function calculatePersonalMode(totalAssetValue) {
         const relationship = document.getElementById('relationshipPersonal').value;
         let exemption = 500000000; // 기본 공제
@@ -137,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // 전체 모드 계산
+    // 전체 모드 계산 함수
     function calculateGroupMode(totalAssetValue) {
         const heirs = Array.from(document.querySelectorAll('.heir-entry')).map(heir => {
             const name = heir.querySelector('input[type="text"]').value;
@@ -191,3 +236,4 @@ document.addEventListener('DOMContentLoaded', () => {
         return Math.max(totalTax, 0);
     }
 });
+                      
