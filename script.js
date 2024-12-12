@@ -9,15 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const calculateButton = document.getElementById('calculateButton');
     const result = document.getElementById('result');
 
-    // 초기 드롭다운에 이벤트 등록
-    document.querySelectorAll('.assetType').forEach((selectElement) => {
-      selectElement.addEventListener('change', (event) => {
-        const assetType = event.target.value;
-        const container = event.target.closest('.asset-entry');
-        updateAssetFields(assetType, container);
-      });
-   });
-
     // 숫자에 콤마를 추가하는 함수
     function formatNumberWithCommas(value) {
         return parseInt(value.replace(/[^0-9]/g, '') || '0', 10).toLocaleString();
@@ -70,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function createAssetEntry() {
         const newAsset = document.createElement('div');
         newAsset.className = 'asset-entry';
-        newAsset.innerHTML = `
+        newAsset.innerHTML = 
             <label>재산 유형:</label>
             <select class="assetType">
                 <option value="cash">현금</option>
@@ -86,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <input type="text" class="stockTotalField assetValue" placeholder="금액 (원)" style="display: none;" readonly>
                 <input type="text" class="othersField assetValue" placeholder="금액 (원)" style="display: none;">
             </div>
-        `;
+        ;
         assetContainer.appendChild(newAsset);
 
         // 추가 필드에 이벤트 등록
@@ -94,18 +85,18 @@ document.addEventListener('DOMContentLoaded', () => {
         addCommaFormatting(newAsset.querySelector('.realEstateField'));
         addCommaFormatting(newAsset.querySelector('.othersField'));
 
-         // [추가] 주당 가격과 주식 수량에도 콤마 이벤트 등록
-         addCommaFormatting(newAsset.querySelector('.stockPriceField'));
-         addCommaFormatting(newAsset.querySelector('.stockQuantityField'));
+        // 재산 유형 선택 이벤트
+        const assetTypeSelect = newAsset.querySelector('.assetType');
+        assetTypeSelect.addEventListener('change', () => {
+            updateAssetFields(assetTypeSelect.value, newAsset);
+        });
        
-       // 재산 유형 선택 이벤트 등록
-         const assetTypeSelect = newAsset.querySelector('.assetType');
-         assetTypeSelect.addEventListener('change', (event) => {
-         const assetType = event.target.value;
-         const container = event.target.closest('.asset-entry');
-         updateAssetFields(assetType, container);
-       });
-                    
+        // 새 드롭다운 이벤트 연결
+        const newAssetTypeSelect = newAsset.querySelector('.assetType');
+        newAssetTypeSelect.addEventListener('change', () => {
+            updateAssetFields(newAssetTypeSelect.value, newAsset);
+        });
+        
         // 주식 계산 로직
         const stockQuantityField = newAsset.querySelector('.stockQuantityField');
         const stockPriceField = newAsset.querySelector('.stockPriceField');
@@ -114,12 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
         stockPriceField.addEventListener('input', updateStockTotal);
 
         function updateStockTotal() {
-          // [수정] 콤마를 제거하고 계산
-          const quantity = parseInt(stockQuantityField.value.replace(/,/g, '') || '0', 10);
-          const price = parseInt(stockPriceField.value.replace(/,/g, '') || '0', 10);
-          stockTotalField.value = formatNumberWithCommas((quantity * price).toString());
-         }
-      
+            const quantity = parseInt(stockQuantityField.value || '0', 10);
+            const price = parseInt(stockPriceField.value.replace(/,/g, '') || '0', 10);
+            stockTotalField.value = formatNumberWithCommas((quantity * price).toString());
+        }
+    }
+
     // 재산 추가 버튼 이벤트
     addAssetButton.addEventListener('click', createAssetEntry);
 
@@ -127,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     addHeirButton.addEventListener('click', () => {
         const newHeir = document.createElement('div');
         newHeir.className = 'heir-entry';
-        newHeir.innerHTML = `
+        newHeir.innerHTML = 
             <input type="text" placeholder="이름">
             <select>
                 <option value="spouse">배우자</option>
@@ -138,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <option value="other">기타</option>
             </select>
             <input type="number" placeholder="상속 비율 (%)">
-        `;
+        ;
         heirContainer.appendChild(newHeir);
     });
 
@@ -179,13 +170,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const taxableAmount = Math.max(totalAssetValue - exemption, 0);
         const tax = calculateTax(taxableAmount);
 
-        result.innerHTML = `
+        result.innerHTML = 
             <h3>계산 결과 (개인 모드)</h3>
             <p>총 재산 금액: ${formatNumberWithCommas(totalAssetValue.toString())} 원</p>
             <p>공제 금액: ${formatNumberWithCommas(exemption.toString())} 원</p>
             <p>과세 금액: ${formatNumberWithCommas(taxableAmount.toString())} 원</p>
             <p>상속세: ${formatNumberWithCommas(tax.toString())} 원</p>
-        `;
+        ;
     }
 
     // 전체 모드 계산
@@ -208,17 +199,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return { name, share, assetValue: heirAssetValue, exemption, taxableAmount, tax };
         });
 
-        result.innerHTML = `
+        result.innerHTML = 
             <h3>계산 결과 (전체 모드)</h3>
-            ${heirs.map(heir => `
+            ${heirs.map(heir => 
                 <p>
                     <strong>${heir.name}</strong>: ${formatNumberWithCommas(heir.assetValue.toString())} 원<br>
                     공제 금액: ${formatNumberWithCommas(heir.exemption.toString())} 원<br>
                     과세 금액: ${formatNumberWithCommas(heir.taxableAmount.toString())} 원<br>
                     상속세: ${formatNumberWithCommas(heir.tax.toString())} 원
                 </p>
-            `).join('')}
-        `;
+            ).join('')}
+        ;
     }
 
     // 상속세 계산 함수
