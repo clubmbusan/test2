@@ -114,17 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
         stockPriceField.addEventListener('input', updateStockTotal);
 
         function updateStockTotal() {
-        const quantity = parseInt(stockQuantityField.value.replace(/,/g, '') || '0', 10);
-        const price = parseInt(stockPriceField.value.replace(/,/g, '') || '0', 10);
-        stockTotalField.value = formatNumberWithCommas((quantity * price).toString());
-                
-        function updateStockTotal() {
           // [수정] 콤마를 제거하고 계산
           const quantity = parseInt(stockQuantityField.value.replace(/,/g, '') || '0', 10);
           const price = parseInt(stockPriceField.value.replace(/,/g, '') || '0', 10);
           stockTotalField.value = formatNumberWithCommas((quantity * price).toString());
          }
-       }
+      
     // 재산 추가 버튼 이벤트
     addAssetButton.addEventListener('click', createAssetEntry);
 
