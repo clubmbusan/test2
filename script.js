@@ -183,7 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 개인 모드 계산 함수
-    // 개인 모드 계산 함수
 function calculatePersonalMode(totalAssetValue) {
     const relationship = document.getElementById('relationshipPersonal');
     if (!relationship) {
@@ -277,27 +276,29 @@ function calculateGroupMode(totalAssetValue) {
     `;
 }
 
-    // 상속세 계산 함수 (누진 공제 반영)
-    function calculateTax(taxableAmount) {
-        const taxBrackets = [
-            { limit: 100000000, rate: 0.1, deduction: 0 },
-            { limit: 500000000, rate: 0.2, deduction: 10000000 },
-            { limit: 1000000000, rate: 0.3, deduction: 60000000 },
-            { limit: 3000000000, rate: 0.4, deduction: 160000000 },
-            { limit: Infinity, rate: 0.5, deduction: 460000000 }
-        ];
+    // 상속세 계산 함수 (2025 누진 공제 반영)
+   function calculateTax(taxableAmount) {
+    const taxBrackets = [
+        { limit: 1000000000, rate: 0.1, deduction: 0 }, // 10억 이하
+        { limit: 5000000000, rate: 0.2, deduction: 10000000 }, // 50억 이하
+        { limit: 10000000000, rate: 0.3, deduction: 60000000 }, // 100억 이하
+        { limit: 30000000000, rate: 0.4, deduction: 160000000 }, // 300억 이하
+        { limit: Infinity, rate: 0.5, deduction: 460000000 } // 300억 초과
+    ];
 
-        for (const bracket of taxBrackets) {
-            if (taxableAmount <= bracket.limit) {
-                return Math.max((taxableAmount * bracket.rate) - bracket.deduction, 0);
-            }
+    for (const bracket of taxBrackets) {
+        if (taxableAmount <= bracket.limit) {
+            return Math.max((taxableAmount * bracket.rate) - bracket.deduction, 0);
         }
-
-        return 0;
     }
 
-    // 숫자 포맷 함수
-    function formatNumberWithCommas(value) {
-        return parseInt(value.replace(/[^0-9]/g, '') || '0', 10).toLocaleString();
-    }
+    return 0;
+}
+
+// 숫자 포맷 함수
+function formatNumberWithCommas(value) {
+    return parseInt(value.replace(/[^0-9]/g, '') || '0', 10).toLocaleString();
+}
+
+// DOMContentLoaded 이벤트 리스너 종료
 });
