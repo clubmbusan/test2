@@ -14,14 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBusinessGroupHeirButton = document.getElementById('addBusinessGroupHeirButton');
     const calculateButton = document.getElementById('calculateButton');
     const result = document.getElementById('result');
- 
+
     // 상속 유형 버튼 클릭 시 애니메이션 제거
     const inheritanceTypeButton = document.getElementById('inheritanceType');
     if (inheritanceTypeButton) {
         inheritanceTypeButton.addEventListener('click', () => {
             inheritanceTypeButton.style.animation = 'none'; // 애니메이션 중지
         });
-    
+    }
+
     // 초기화: 모든 섹션 숨기기
     function resetSections() {
         personalSection.style.display = 'none';
@@ -30,12 +31,15 @@ document.addEventListener('DOMContentLoaded', () => {
         businessGroupSection.style.display = 'none';
         businessTypeContainer.style.display = 'none';
     }
-        // 초기 로딩 시 개인 상속을 기본값으로 설정
+
+    // 초기 로딩 시 개인 상속을 기본값으로 설정
     function initializeDefaultView() {
         resetSections();
         inheritanceType.value = 'personal'; // 기본값 설정
         personalSection.style.display = 'block'; // 개인 상속 섹션 표시
     }
+
+    initializeDefaultView(); // 초기화 호출
 
     // 상속 유형 변경 시
     inheritanceType.addEventListener('change', () => {
@@ -64,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 가업 개인 상속: 후계자 유형 변경 이벤트
-     const businessHeirType = document.getElementById('businessHeirType'); // 가업 개인 후계자 유형
+    const businessHeirType = document.getElementById('businessHeirType'); // 가업 개인 후계자 유형
     if (businessHeirType) {
         businessHeirType.addEventListener('change', () => {
             console.log(`가업 개인 후계자 유형 선택됨: ${businessHeirType.value}`);
@@ -88,8 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
         businessGroupHeirContainer.appendChild(newHeirEntry);
         console.log('가업 단체 상속인 추가');
     });
-
-    }
 
     // 초기화: 모든 .assetValue 필드에 콤마 이벤트 등록
     document.querySelectorAll('.assetValue').forEach(addCommaFormatting);
@@ -119,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+});
 
     // 재산 유형에 따라 필드를 동적으로 표시
     function handleAssetTypeChange(assetTypeSelect) {
