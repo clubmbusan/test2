@@ -21,8 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         inheritanceTypeButton.addEventListener('click', () => {
             inheritanceTypeButton.style.animation = 'none'; // 애니메이션 중지
         });
-    }
-
+    
     // 초기화: 모든 섹션 숨기기
     function resetSections() {
         personalSection.style.display = 'none';
