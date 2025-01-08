@@ -149,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
         }
     }
-});
 
     // 재산 항목 생성
     function createAssetEntry() {
