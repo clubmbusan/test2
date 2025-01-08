@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         businessGroupSection.style.display = 'none';
         businessTypeContainer.style.display = 'none';
         addHeirButton.style.display = 'none'; // "상속인 추가" 버튼 숨김
+        heirContainer.style.display = 'none'; // 상속인 입력 필드 숨김
     }
 
     // 선택 이벤트 (가업 개인/단체 전환)
