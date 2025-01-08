@@ -42,29 +42,33 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDefaultView(); // 초기화 호출
 
     // 상속 유형 변경 시
-   inheritanceType.addEventListener('change', () => {
-        resetSections(); // 모든 섹션 초기화
+    inheritanceType.addEventListener('change', () => {
+        resetSections();
 
         if (inheritanceType.value === 'personal') {
-            personalSection.style.display = 'block'; // 개인 상속 화면 활성화
+            personalSection.style.display = 'block'; // 개인 상속 섹션 표시
         } else if (inheritanceType.value === 'group') {
-            groupSection.style.display = 'block'; // 전체 상속 화면 활성화
+            groupSection.style.display = 'block'; // 전체 상속 섹션 표시
         } else if (inheritanceType.value === 'business') {
-            businessTypeContainer.style.display = 'block'; // 가업 상속 유형 선택 표시
-            businessType.value = 'businessPersonal'; // 기본값: 가업 개인 상속
-            businessPersonalSection.style.display = 'block'; // 가업 개인 상속 화면 활성화
+            businessTypeContainer.style.display = 'block'; // 가업 상속 하위 필드 표시
+            // 가업 상속 기본값에 따라 페이지 표시
+            if (businessType.value === 'businessPersonal') {
+                businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
+            } else if (businessType.value === 'businessGroup') {
+                businessGroupSection.style.display = 'block'; // 가업 단체 상속 섹션 표시
+            }
         }
     });
 
     // 가업 상속 유형 변경 시
     businessType.addEventListener('change', () => {
-        businessPersonalSection.style.display = 'none';
-        businessGroupSection.style.display = 'none';
+        resetSections();
+        businessTypeContainer.style.display = 'block'; // 가업 상속 유형 선택 표시
 
         if (businessType.value === 'businessPersonal') {
-            businessPersonalSection.style.display = 'block'; // 가업 개인 상속 화면 활성화
+            businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
         } else if (businessType.value === 'businessGroup') {
-            businessGroupSection.style.display = 'block'; // 가업 단체 상속 화면 활성화
+            businessGroupSection.style.display = 'block'; // 가업 단체 상속 섹션 표시
         }
     });
 
