@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetSections() {
         personalSection.style.display = 'none';
         groupSection.style.display = 'none';
-        businessPersonalSection.style.display = 'none';
         businessGroupSection.style.display = 'none';
         businessTypeContainer.style.display = 'none';
     }
