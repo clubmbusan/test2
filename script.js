@@ -33,21 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addHeirButton.style.display = 'none'; // "상속인 추가" 버튼 숨김
         heirContainer.style.display = 'none'; // 상속인 입력 필드 숨김
     }
-
-    // 선택 이벤트 (가업 개인/단체 전환)
-    businessType.addEventListener('change', () => {
-        // 모든 섹션 초기화
-        businessPersonalSection.style.display = 'none';
-        businessGroupSection.style.display = 'none';
-
-        // 선택에 따라 표시
-        if (businessType.value === 'businessPersonal') {
-            businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
-        } else if (businessType.value === 'businessGroup') {
-            businessGroupSection.style.display = 'block'; // 가업 단체 상속 섹션 표시
-        }
-    });
-    
+       
             // 상속 유형 변경 시
     inheritanceType.addEventListener('change', () => {
         resetSections();
