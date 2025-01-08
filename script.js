@@ -7,10 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const businessPersonalSection = document.getElementById('businessPersonalSection');
     const businessGroupSection = document.getElementById('businessGroupSection');
     const businessTypeContainer = document.getElementById('businessTypeContainer');
-    const inheritanceTypeButton = document.getElementById('inheritanceType');
+    const addAssetButton = document.getElementById('addAssetButton');
+    const assetContainer = document.getElementById('assetContainer');
+    const addHeirButton = document.getElementById('addHeirButton');
     const businessGroupHeirContainer = document.getElementById('businessGroupHeirContainer');
     const addBusinessGroupHeirButton = document.getElementById('addBusinessGroupHeirButton');
-    const businessHeirType = document.getElementById('businessHeirType');
+    const calculateButton = document.getElementById('calculateButton');
+    const result = document.getElementById('result');
+    const inheritanceTypeButton = document.getElementById('inheritanceType'); // 버튼 참조
 
     // 상속 유형 버튼 클릭 시 애니메이션 제거
     if (inheritanceTypeButton) {
@@ -28,13 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
         businessTypeContainer.style.display = 'none';
     }
 
-    // 초기 로딩 시 가업 개인 상속을 기본값으로 설정
+    // 초기 로딩 시 개인 상속을 기본값으로 설정
     function initializeDefaultView() {
         resetSections();
-        inheritanceType.value = 'business'; // 가업 상속 기본 선택
-        businessTypeContainer.style.display = 'block'; // 가업 상속 유형 선택 표시
-        businessType.value = 'businessPersonal'; // 가업 개인 상속 기본 선택
-        businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
+        inheritanceType.value = 'personal'; // 개인 상속을 기본값으로 설정
+        personalSection.style.display = 'block'; // 개인 상속 섹션 표시
     }
 
     initializeDefaultView(); // 초기화 호출
@@ -46,9 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (inheritanceType.value === 'personal') {
             personalSection.style.display = 'block'; // 개인 상속 섹션 표시
         } else if (inheritanceType.value === 'group') {
-            groupSection.style.display = 'block'; // 전체 상속 섹션 표시
+            groupSection.style.display = 'block'; // 일반 단체 상속 섹션 표시
         } else if (inheritanceType.value === 'business') {
-            businessTypeContainer.style.display = 'block'; // 가업 상속 하위 필드 표시
+            businessTypeContainer.style.display = 'block'; // 가업 상속 하위 선택 섹션 표시
             if (businessType.value === 'businessPersonal') {
                 businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
             } else if (businessType.value === 'businessGroup') {
@@ -60,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 가업 상속 유형 변경 시
     businessType.addEventListener('change', () => {
         resetSections();
-        businessTypeContainer.style.display = 'block'; // 가업 상속 유형 선택 표시
+        businessTypeContainer.style.display = 'block'; // 가업 상속 유형 선택 섹션 표시
 
         if (businessType.value === 'businessPersonal') {
             businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
@@ -70,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 가업 개인 상속: 후계자 유형 변경 이벤트
+    const businessHeirType = document.getElementById('businessHeirType'); // 가업 개인 후계자 유형
     if (businessHeirType) {
         businessHeirType.addEventListener('change', () => {
             console.log(`가업 개인 후계자 유형 선택됨: ${businessHeirType.value}`);
