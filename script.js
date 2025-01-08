@@ -414,6 +414,7 @@ function calculateBusinessGroupMode(totalAssetValue) {
         `).join('')}
     `;
 }
+});
 
     // 상속세 계산 함수 (2025 누진 공제 반영)
    function calculateTax(taxableAmount) {
