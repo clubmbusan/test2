@@ -50,7 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (inheritanceType.value === 'group') {
             groupSection.style.display = 'block'; // 전체 상속 섹션 표시
         } else if (inheritanceType.value === 'business') {
-            businessTypeContainer.style.display = 'block'; // 가업 상속 하위 필드 표시            
+            businessTypeContainer.style.display = 'block'; // 가업 상속 하위 필드 표시
+            if (businessType.value === 'businessPersonal') {
+                businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
+            } else if (businessType.value === 'businessGroup') {
+                businessGroupSection.style.display = 'block'; // 가업 단체 상속 섹션 표시
+            }
         }
     });
 
