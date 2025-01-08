@@ -98,14 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('가업 단체 상속인 추가');
     });
                              
-    // 초기화: 모든 .assetValue 필드에 콤마 이벤트 등록
-    document.querySelectorAll('.assetValue').forEach(addCommaFormatting);
-
-    // 초기 주식 입력 필드에 콤마 이벤트 등록 (중요: 항상 초기화 시 필요)
-    const initialStockPriceField = document.querySelector('.stockPriceField');
-    if (initialStockPriceField) {
-        addCommaFormatting(initialStockPriceField); // 초기 필드 이벤트 등록
-    }
+ 
                              
     // 초기화: 모든 .assetValue 필드에 콤마 이벤트 등록
     document.querySelectorAll('.assetValue').forEach(addCommaFormatting);
@@ -115,12 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (initialStockPriceField) {
         addCommaFormatting(initialStockPriceField); // 초기 필드 이벤트 등록
     }
-
-    // 초기화: 모든 .assetType 필드에 이벤트 등록
-    document.querySelectorAll('.assetType').forEach(select => {
-        select.addEventListener('change', () => handleAssetTypeChange(select));
-    });
-
+    
     // 숫자에 콤마를 추가하는 함수
     function formatNumberWithCommas(value) {
         return parseInt(value.replace(/[^0-9]/g, '') || '0', 10).toLocaleString();
