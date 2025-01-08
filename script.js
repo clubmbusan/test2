@@ -230,19 +230,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-       // 계산 버튼 이벤트
-    calculateButton.addEventListener('click', () => {
-        const totalAssetValue = Array.from(document.querySelectorAll('.assetValue')).reduce((sum, field) => {
-            const value = parseInt(field.value.replace(/,/g, '') || '0', 10);
-            return sum + value;
-        }, 0);
+        // 계산 버튼 이벤트
+calculateButton.addEventListener('click', () => {
+    const totalAssetValue = Array.from(document.querySelectorAll('.assetValue')).reduce((sum, field) => {
+        const value = parseInt(field.value.replace(/,/g, '') || '0', 10);
+        return sum + value;
+    }, 0);
 
-        if (inheritanceType.value === 'personal') {
-            calculatePersonalMode(totalAssetValue);
-        } else {
-            calculateGroupMode(totalAssetValue);
+    if (inheritanceType.value === 'personal') {
+        calculatePersonalMode(totalAssetValue);
+    } else if (inheritanceType.value === 'group') {
+        calculateGroupMode(totalAssetValue);
+    } else if (inheritanceType.value === 'business') {
+        if (businessType.value === 'businessPersonal') {
+            calculateBusinessPersonalMode(totalAssetValue);
+        } else if (businessType.value === 'businessGroup') {
+            calculateBusinessGroupMode(totalAssetValue);
         }
-    });
+    }
+});
 
     // 개인 모드 계산 함수
 function calculatePersonalMode(totalAssetValue) {
