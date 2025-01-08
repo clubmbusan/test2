@@ -1,13 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const inheritanceType = document.getElementById('inheritanceType');
-    const personalSection = document.getElementById('personalSection');
-    const groupSection = document.getElementById('groupSection');
+    const inheritanceType = document.getElementById('inheritanceType'); // 상속 유형 선택 필드
+    const businessType = document.getElementById('businessType'); // 가업 상속 하위 필드
+    const personalSection = document.getElementById('personalSection'); // 개인 상속 섹션
+    const groupSection = document.getElementById('groupSection'); // 전체 상속 섹션
+    const businessPersonalSection = document.getElementById('businessPersonalSection'); // 가업 개인 상속 섹션
+    const businessGroupSection = document.getElementById('businessGroupSection'); // 가업 단체 상속 섹션
+    const businessTypeContainer = document.getElementById('businessTypeContainer'); // 가업 상속 유형 선택 컨테이너
     const addAssetButton = document.getElementById('addAssetButton');
     const assetContainer = document.getElementById('assetContainer');
     const addHeirButton = document.getElementById('addHeirButton');
     const heirContainer = document.getElementById('heirContainer');
-    const calculateButton = document.getElementById('calculateButton');
-    const result = document.getElementById('result');
 
     // 상속 유형 버튼 클릭 시 애니메이션 제거
     const inheritanceTypeButton = document.getElementById('inheritanceType');
@@ -17,11 +19,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // DOM 요소 확인
-    if (!calculateButton || !inheritanceType || !result) {
-        console.error('필요한 DOM 요소가 없습니다. HTML을 확인하세요.');
-        return;
+    // 초기화: 모든 섹션 숨기기
+    function resetSections() {
+        personalSection.style.display = 'none';
+        groupSection.style.display = 'none';
+        businessPersonalSection.style.display = 'none';
+        businessGroupSection.style.display = 'none';
+        businessTypeContainer.style.display = 'none';
     }
+
+    // 상속 유형 변경 시
+    inheritanceType.addEventListener('change', () => {
+        resetSections();
+
+        if (inheritanceType.value === 'personal') {
+            personalSection.style.display = 'block'; // 개인 상속 섹션 표시
+        } else if (inheritanceType.value === 'group') {
+            groupSection.style.display = 'block'; // 전체 상속 섹션 표시
+        } else if (inheritanceType.value === 'business') {
+            businessTypeContainer.style.display = 'block'; // 가업 상속 하위 필드 표시
+        }
+    });
+
+    // 가업 상속 유형 변경 시
+    businessType.addEventListener('change', () => {
+        if (businessType.value === 'businessPersonal') {
+            resetSections();
+            businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
+        } else if (businessType.value === 'businessGroup') {
+            resetSections();
+            businessGroupSection.style.display = 'block'; // 가업 단체 상속 섹션 표시
+        }
+    });
 
     // 초기화: 모든 .assetValue 필드에 콤마 이벤트 등록
     document.querySelectorAll('.assetValue').forEach(addCommaFormatting);
@@ -88,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
         }
     }
+});
 
     // 재산 항목 생성
     function createAssetEntry() {
