@@ -1,4 +1,3 @@
-// main.js
 document.addEventListener('DOMContentLoaded', () => {
     // DOM 요소 참조
     const inheritanceType = document.getElementById('inheritanceType');
