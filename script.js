@@ -23,15 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 섹션 초기화 함수
+   // 섹션 초기화 함수
     function resetSections() {
         personalSection.style.display = 'none';
         groupSection.style.display = 'none';
         businessPersonalSection.style.display = 'none';
         businessGroupSection.style.display = 'none';
         businessTypeContainer.style.display = 'none';
-        addHeirButton.style.display = 'none'; // "상속인 추가" 버튼 숨김
-        heirContainer.style.display = 'none'; // 상속인 입력 필드 숨김
+
+        if (addHeirButton) addHeirButton.style.display = 'none'; // 상속인 추가 버튼 숨김
+        if (heirContainer) heirContainer.style.display = 'none'; // 상속인 입력 필드 숨김
 
         // "전체 상속" 섹션 내부 텍스트 초기화
         groupSection.innerHTML = ''; // 전체 상속 관련 텍스트 초기화
@@ -45,8 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
             personalSection.style.display = 'block'; // 개인 상속 섹션 표시
         } else if (inheritanceType.value === 'group') {
             groupSection.style.display = 'block'; // 전체 상속 섹션 표시
-            addHeirButton.style.display = 'block'; // 상속인 추가 버튼 표시
-            heirContainer.style.display = 'block'; // 상속인 입력 필드 표시
+            if (addHeirButton) addHeirButton.style.display = 'block'; // 상속인 추가 버튼 표시
+            if (heirContainer) heirContainer.style.display = 'block'; // 상속인 입력 필드 표시
         } else if (inheritanceType.value === 'business') {
             businessTypeContainer.style.display = 'block'; // 가업 상속 하위 필드 표시
 
@@ -89,8 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         businessGroupHeirContainer.appendChild(newHeirEntry);
     });
-
-    // 상속 유형 변경 시 이벤트 리스너 (추가된 동작 방지)
+    
+       // 상속 유형 변경 시 이벤트 리스너 (추가된 동작 방지)
     inheritanceType.addEventListener('change', () => {
         resetSections();
 
