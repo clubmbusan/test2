@@ -23,13 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 초기화: 모든 섹션 숨기기
-    function resetSections() {
-        personalSection.style.display = 'none';
-        groupSection.style.display = 'none';
-        businessPersonalSection.style.display = 'none';
-        businessGroupSection.style.display = 'none';
-        businessTypeContainer.style.display = 'none';
+   // 초기 로딩 시 가업 개인 상속을 기본값으로 설정
+    function initializeDefaultView() {
+        resetSections();
+        inheritanceType.value = 'business'; // 가업 상속 기본 선택
+        businessTypeContainer.style.display = 'block'; // 가업 상속 유형 선택 표시
+        businessType.value = 'businessPersonal'; // 가업 개인 상속 기본 선택
+        businessPersonalSection.style.display = 'block'; // 가업 개인 상속 필드 표시
     }
 
     // 초기 로딩 시 개인 상속을 기본값으로 설정
@@ -50,20 +50,25 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (inheritanceType.value === 'group') {
             groupSection.style.display = 'block'; // 전체 상속 섹션 표시
         } else if (inheritanceType.value === 'business') {
-            businessTypeContainer.style.display = 'block'; // 가업 상속 하위 필드 표시            
+            businessTypeContainer.style.display = 'block'; // 가업 상속 하위 필드 표시
+            // 가업 상속 기본값에 따라 페이지 표시
+            if (businessType.value === 'businessPersonal') {
+                businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
+            } else if (businessType.value === 'businessGroup') {
+                businessGroupSection.style.display = 'block'; // 가업 단체 상속 섹션 표시
+            }
         }
     });
 
     // 가업 상속 유형 변경 시
     businessType.addEventListener('change', () => {
         resetSections();
+        businessTypeContainer.style.display = 'block'; // 가업 상속 유형 선택 표시
 
         if (businessType.value === 'businessPersonal') {
             businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
-            console.log('가업 개인 상속 섹션 표시');
         } else if (businessType.value === 'businessGroup') {
             businessGroupSection.style.display = 'block'; // 가업 단체 상속 섹션 표시
-            console.log('가업 단체 상속 섹션 표시');
         }
     });
 
@@ -92,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         businessGroupHeirContainer.appendChild(newHeirEntry);
         console.log('가업 단체 상속인 추가');
     });
-
+    
     // 초기화: 모든 .assetValue 필드에 콤마 이벤트 등록
     document.querySelectorAll('.assetValue').forEach(addCommaFormatting);
 
