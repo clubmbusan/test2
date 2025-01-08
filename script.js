@@ -31,6 +31,20 @@ document.addEventListener('DOMContentLoaded', () => {
         businessGroupSection.style.display = 'none';
         businessTypeContainer.style.display = 'none';
     }
+
+    // 선택 이벤트 (가업 개인/단체 전환)
+    businessType.addEventListener('change', () => {
+        // 모든 섹션 초기화
+        businessPersonalSection.style.display = 'none';
+        businessGroupSection.style.display = 'none';
+
+        // 선택에 따라 표시
+        if (businessType.value === 'businessPersonal') {
+            businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
+        } else if (businessType.value === 'businessGroup') {
+            businessGroupSection.style.display = 'block'; // 가업 단체 상속 섹션 표시
+        }
+    });
     
             // 상속 유형 변경 시
     inheritanceType.addEventListener('change', () => {
