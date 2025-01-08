@@ -121,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
 
     // 재산 유형에 따라 필드를 동적으로 표시
     function handleAssetTypeChange(assetTypeSelect) {
