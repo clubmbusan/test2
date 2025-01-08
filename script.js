@@ -306,6 +306,83 @@ function calculateGroupMode(totalAssetValue) {
     `;
 }
 
+// 추가된 가업 개인 모드 계산 함수
+function calculateBusinessPersonalMode(totalAssetValue) {
+    const heirType = document.getElementById('businessHeirType');
+    if (!heirType) {
+        console.error('후계자 선택 요소가 없습니다.');
+        return;
+    }
+
+    const heirValue = heirType.value;
+    let exemption = 6000000000; // 기본 공제 (60억 원)
+
+    if (heirValue === 'minorChild') {
+        exemption += 30000000; // 미성년 자녀 추가 공제 (3천만 원)
+    } else if (heirValue === 'other') {
+        exemption = 0; // 기타 후계자는 공제 없음
+    }
+
+    const taxableAmount = Math.max(totalAssetValue - exemption, 0);
+    const tax = calculateTax(taxableAmount);
+
+    result.innerHTML = `
+        <h3>계산 결과 (가업 개인 상속 모드)</h3>
+        <p>총 재산 금액: ${formatNumberWithCommas(totalAssetValue.toString())} 원</p>
+        <p>공제 금액: ${formatNumberWithCommas(exemption.toString())} 원</p>
+        <p>과세 금액: ${formatNumberWithCommas(taxableAmount.toString())} 원</p>
+        <p>상속세: ${formatNumberWithCommas(tax.toString())} 원</p>
+    `;
+}
+
+// 추가된 가업 단체 모드 계산 함수
+function calculateBusinessGroupMode(totalAssetValue) {
+    const heirs = Array.from(document.querySelectorAll('.heir-entry')).map((heir, index) => {
+        const name = heir.querySelector('input[type="text"]').value || `상속인 ${index + 1}`;
+        const relationship = heir.querySelector('select').value || "기타";
+        const shareField = heir.querySelector('input[type="number"]');
+        const share = parseFloat(shareField.value) || 0;
+
+        if (!shareField.value || share === 0) {
+            alert(`${name}의 상속 비율이 입력되지 않았습니다. 비율을 입력 후 다시 시도해주세요.`);
+            throw new Error("상속 비율 누락");
+        }
+
+        const heirAssetValue = (totalAssetValue * share) / 100;
+
+        let exemption = 6000000000; // 기본 공제 (60억 원)
+        if (relationship === 'spouse') {
+            exemption += 3500000000; // 배우자 공제 (35억 원)
+        } else if (relationship === 'adultChild') {
+            exemption += 50000000; // 성년 자녀 공제 (5천만 원)
+        } else if (relationship === 'minorChild') {
+            exemption += 30000000; // 미성년 자녀 공제 (3천만 원)
+        } else if (relationship === 'other') {
+            exemption = 0; // 기타 후계자는 공제 없음
+        }
+
+        const taxableAmount = Math.max(heirAssetValue - exemption, 0);
+        const tax = calculateTax(taxableAmount);
+
+        return { name, share, assetValue: heirAssetValue, exemption, taxableAmount, tax };
+    });
+
+    const totalInheritedAssets = heirs.reduce((sum, heir) => sum + heir.assetValue, 0);
+
+    result.innerHTML = `
+        <h3>계산 결과 (가업 단체 상속 모드)</h3>
+        <p><strong>상속 재산 합계:</strong> ${formatNumberWithCommas(totalInheritedAssets.toString())} 원</p>
+        ${heirs.map(heir => `
+            <p>
+                <strong>${heir.name}</strong>: ${formatNumberWithCommas(heir.assetValue.toString())} 원<br>
+                공제 금액: ${formatNumberWithCommas(heir.exemption.toString())} 원<br>
+                과세 금액: ${formatNumberWithCommas(heir.taxableAmount.toString())} 원<br>
+                상속세: ${formatNumberWithCommas(heir.tax.toString())} 원
+            </p>
+        `).join('')}
+    `;
+}
+
     // 상속세 계산 함수 (2025 누진 공제 반영)
    function calculateTax(taxableAmount) {
     const taxBrackets = [
