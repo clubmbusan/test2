@@ -1,17 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const inheritanceType = document.getElementById('inheritanceType'); // 상속 유형 선택 필드
-    const businessType = document.getElementById('businessType'); // 가업 상속 하위 필드
-    const personalSection = document.getElementById('personalSection'); // 개인 상속 섹션
-    const groupSection = document.getElementById('groupSection'); // 전체 상속 섹션
-    const businessPersonalSection = document.getElementById('businessPersonalSection'); // 가업 개인 상속 섹션
-    const businessGroupSection = document.getElementById('businessGroupSection'); // 가업 단체 상속 섹션
-    const businessTypeContainer = document.getElementById('businessTypeContainer'); // 가업 상속 유형 선택 컨테이너
+    // DOM 요소 참조
+    const inheritanceType = document.getElementById('inheritanceType');
+    const businessType = document.getElementById('businessType');
+    const personalSection = document.getElementById('personalSection');
+    const groupSection = document.getElementById('groupSection');
+    const businessPersonalSection = document.getElementById('businessPersonalSection');
+    const businessGroupSection = document.getElementById('businessGroupSection');
+    const businessTypeContainer = document.getElementById('businessTypeContainer');
     const addAssetButton = document.getElementById('addAssetButton');
     const assetContainer = document.getElementById('assetContainer');
     const addHeirButton = document.getElementById('addHeirButton');
-    const heirContainer = document.getElementById('heirContainer');
-    const businessHeirType = document.getElementById('businessHeirType'); // 가업 개인 상속 후계자 유형
-
+    const businessGroupHeirContainer = document.getElementById('businessGroupHeirContainer');
+    const addBusinessGroupHeirButton = document.getElementById('addBusinessGroupHeirButton');
+    const calculateButton = document.getElementById('calculateButton');
+    const result = document.getElementById('result');
+ 
     // 상속 유형 버튼 클릭 시 애니메이션 제거
     const inheritanceTypeButton = document.getElementById('inheritanceType');
     if (inheritanceTypeButton) {
@@ -38,8 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (inheritanceType.value === 'group') {
             groupSection.style.display = 'block'; // 전체 상속 섹션 표시
         } else if (inheritanceType.value === 'business') {
-            businessTypeContainer.style.display = 'block'; // 가업 상속 하위 필드 표시
-            console.log('가업 상속 유형 선택 가능');
+            businessTypeContainer.style.display = 'block'; // 가업 상속 하위 필드 표시            
         }
     });
 
@@ -57,31 +59,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 가업 개인 상속: 후계자 유형 변경 이벤트
+     const businessHeirType = document.getElementById('businessHeirType'); // 가업 개인 후계자 유형
     if (businessHeirType) {
         businessHeirType.addEventListener('change', () => {
-            const selectedValue = businessHeirType.value;
-            console.log(`후계자 유형 선택됨: ${selectedValue}`);
+            console.log(`가업 개인 후계자 유형 선택됨: ${businessHeirType.value}`);
         });
     }
 
     // 가업 단체 상속: 상속인 추가 버튼 이벤트
-    if (addHeirButton && heirContainer) {
-        addHeirButton.addEventListener('click', () => {
-            const newHeirEntry = document.createElement('div');
-            newHeirEntry.className = 'heir-entry';
-            newHeirEntry.innerHTML = `
-                <input type="text" placeholder="이름">
-                <select>
-                    <option value="spouse">배우자</option>
-                    <option value="adultChild">성년 자녀</option>
-                    <option value="minorChild">미성년 자녀</option>
-                    <option value="other">기타</option>
-                </select>
-                <input type="number" placeholder="상속 비율 (%)">
-            `;
-            heirContainer.appendChild(newHeirEntry);
-            console.log('새 상속인 항목 추가됨');
-        });
+    addBusinessGroupHeirButton.addEventListener('click', () => {
+        const newHeirEntry = document.createElement('div');
+        newHeirEntry.className = 'heir-entry';
+        newHeirEntry.innerHTML = `
+            <input type="text" placeholder="이름">
+            <select>
+                <option value="spouse">배우자</option>
+                <option value="adultChild">성년 자녀</option>
+                <option value="minorChild">미성년 자녀</option>
+                <option value="other">기타</option>
+            </select>
+            <input type="number" placeholder="상속 비율 (%)">
+        `;
+        businessGroupHeirContainer.appendChild(newHeirEntry);
+        console.log('가업 단체 상속인 추가');
+    });
+
     }
 
     // 초기화: 모든 .assetValue 필드에 콤마 이벤트 등록
