@@ -67,7 +67,15 @@ document.addEventListener('DOMContentLoaded', () => {
             businessGroupSection.style.display = 'block'; // 가업 단체 상속 필드 표시
         }
     });
-   
+
+    // 가업 개인 상속: 후계자 유형 변경 이벤트
+    const businessHeirType = document.getElementById('businessHeirType'); // 가업 개인 후계자 유형
+    if (businessHeirType) {
+        businessHeirType.addEventListener('change', () => {
+            console.log(`가업 개인 후계자 유형 선택됨: ${businessHeirType.value}`);
+        });
+    }
+    
     // 가업 단체 상속: 상속인 추가 버튼 이벤트
      addBusinessGroupHeirButton.addEventListener('click', () => {
         const newHeirEntry = document.createElement('div');
