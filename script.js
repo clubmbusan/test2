@@ -67,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
             businessGroupSection.style.display = 'block'; // 가업 단체 상속 화면 활성화
         }
     });
-});
 
     // 가업 개인 상속: 후계자 유형 변경 이벤트
     const businessHeirType = document.getElementById('businessHeirType'); // 가업 개인 후계자 유형
