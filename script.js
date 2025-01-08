@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const assetContainer = document.getElementById('assetContainer');
     const addHeirButton = document.getElementById('addHeirButton');
     const heirContainer = document.getElementById('heirContainer');
+    const businessHeirType = document.getElementById('businessHeirType'); // 가업 개인 상속 후계자 유형
 
     // 상속 유형 버튼 클릭 시 애니메이션 제거
     const inheritanceTypeButton = document.getElementById('inheritanceType');
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             inheritanceTypeButton.style.animation = 'none'; // 애니메이션 중지
         });
     }
-    
+
     // 초기화: 모든 섹션 숨기기
     function resetSections() {
         personalSection.style.display = 'none';
@@ -38,19 +39,50 @@ document.addEventListener('DOMContentLoaded', () => {
             groupSection.style.display = 'block'; // 전체 상속 섹션 표시
         } else if (inheritanceType.value === 'business') {
             businessTypeContainer.style.display = 'block'; // 가업 상속 하위 필드 표시
+            console.log('가업 상속 유형 선택 가능');
         }
     });
 
     // 가업 상속 유형 변경 시
     businessType.addEventListener('change', () => {
+        resetSections();
+
         if (businessType.value === 'businessPersonal') {
-            resetSections();
             businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
+            console.log('가업 개인 상속 섹션 표시');
         } else if (businessType.value === 'businessGroup') {
-            resetSections();
             businessGroupSection.style.display = 'block'; // 가업 단체 상속 섹션 표시
+            console.log('가업 단체 상속 섹션 표시');
         }
     });
+
+    // 가업 개인 상속: 후계자 유형 변경 이벤트
+    if (businessHeirType) {
+        businessHeirType.addEventListener('change', () => {
+            const selectedValue = businessHeirType.value;
+            console.log(`후계자 유형 선택됨: ${selectedValue}`);
+        });
+    }
+
+    // 가업 단체 상속: 상속인 추가 버튼 이벤트
+    if (addHeirButton && heirContainer) {
+        addHeirButton.addEventListener('click', () => {
+            const newHeirEntry = document.createElement('div');
+            newHeirEntry.className = 'heir-entry';
+            newHeirEntry.innerHTML = `
+                <input type="text" placeholder="이름">
+                <select>
+                    <option value="spouse">배우자</option>
+                    <option value="adultChild">성년 자녀</option>
+                    <option value="minorChild">미성년 자녀</option>
+                    <option value="other">기타</option>
+                </select>
+                <input type="number" placeholder="상속 비율 (%)">
+            `;
+            heirContainer.appendChild(newHeirEntry);
+            console.log('새 상속인 항목 추가됨');
+        });
+    }
 
     // 초기화: 모든 .assetValue 필드에 콤마 이벤트 등록
     document.querySelectorAll('.assetValue').forEach(addCommaFormatting);
