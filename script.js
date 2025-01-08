@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBusinessGroupHeirButton = document.getElementById('addBusinessGroupHeirButton');
     const calculateButton = document.getElementById('calculateButton');
     const result = document.getElementById('result');
- 
+
     // 상속 유형 버튼 클릭 시 애니메이션 제거
     const inheritanceTypeButton = document.getElementById('inheritanceType');
     if (inheritanceTypeButton) {
@@ -23,13 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-   // 초기 로딩 시 가업 개인 상속을 기본값으로 설정
-    function initializeDefaultView() {
-        resetSections();
-        inheritanceType.value = 'business'; // 가업 상속 기본 선택
-        businessTypeContainer.style.display = 'block'; // 가업 상속 유형 선택 표시
-        businessType.value = 'businessPersonal'; // 가업 개인 상속 기본 선택
-        businessPersonalSection.style.display = 'block'; // 가업 개인 상속 필드 표시
+    // 섹션 초기화 함수
+    function resetSections() {
+        personalSection.style.display = 'none';
+        groupSection.style.display = 'none';
+        businessPersonalSection.style.display = 'none';
+        businessGroupSection.style.display = 'none';
+        businessTypeContainer.style.display = 'none';
     }
 
     // 초기 로딩 시 개인 상속을 기본값으로 설정
