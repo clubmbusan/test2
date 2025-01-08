@@ -14,9 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBusinessGroupHeirButton = document.getElementById('addBusinessGroupHeirButton');
     const calculateButton = document.getElementById('calculateButton');
     const result = document.getElementById('result');
-    const inheritanceTypeButton = document.getElementById('inheritanceType'); // 버튼 참조
 
     // 상속 유형 버튼 클릭 시 애니메이션 제거
+    const inheritanceTypeButton = document.getElementById('inheritanceType');
     if (inheritanceTypeButton) {
         inheritanceTypeButton.addEventListener('click', () => {
             inheritanceTypeButton.style.animation = 'none'; // 애니메이션 중지
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 초기 로딩 시 개인 상속을 기본값으로 설정
     function initializeDefaultView() {
         resetSections();
-        inheritanceType.value = 'personal'; // 개인 상속을 기본값으로 설정
+        inheritanceType.value = 'personal'; // 기본값 설정
         personalSection.style.display = 'block'; // 개인 상속 섹션 표시
     }
 
@@ -48,9 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (inheritanceType.value === 'personal') {
             personalSection.style.display = 'block'; // 개인 상속 섹션 표시
         } else if (inheritanceType.value === 'group') {
-            groupSection.style.display = 'block'; // 일반 단체 상속 섹션 표시
+            groupSection.style.display = 'block'; // 전체 상속 섹션 표시
         } else if (inheritanceType.value === 'business') {
-            businessTypeContainer.style.display = 'block'; // 가업 상속 하위 선택 섹션 표시
+            businessTypeContainer.style.display = 'block'; // 가업 상속 하위 필드 표시
+            // 가업 상속 기본값에 따라 페이지 표시
             if (businessType.value === 'businessPersonal') {
                 businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
             } else if (businessType.value === 'businessGroup') {
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 가업 상속 유형 변경 시
     businessType.addEventListener('change', () => {
         resetSections();
-        businessTypeContainer.style.display = 'block'; // 가업 상속 유형 선택 섹션 표시
+        businessTypeContainer.style.display = 'block'; // 가업 상속 유형 선택 표시
 
         if (businessType.value === 'businessPersonal') {
             businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
