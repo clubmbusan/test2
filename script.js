@@ -463,16 +463,21 @@ function calculateTotalExemptionDetailed(shareAmount, relationship, spouseShare 
     return exemptions;
 }
 
-// 단체 상속 로직 수정
+// 전체 상속 로직
 function calculateGroupMode(totalAssetValue) {
     const heirs = Array.from(document.querySelectorAll('.heir-entry')).map((heir) => {
         const name = heir.querySelector('input[type="text"]').value || '상속인';
         const relationship = heir.querySelector('select')?.value || 'other';
         const sharePercentage = parseFloat(heir.querySelector('input[type="number"]').value || '0');
 
+        if (sharePercentage <= 0 || isNaN(sharePercentage)) {
+            console.error(`${name}의 상속 비율이 올바르지 않습니다.`);
+            return null; // 잘못된 항목 제외
+        }
+
         const shareAmount = (totalAssetValue * sharePercentage) / 100;
         const { totalExemption, basicExemption, baseExemption, relationshipExemption } =
-            calculateTotalExemptionDetailed(shareAmount, relationship, shareAmount);
+            calculateExemptions(shareAmount, relationship, shareAmount);
         const taxableAmount = Math.max(shareAmount - totalExemption, 0);
         const tax = calculateTax(taxableAmount);
 
@@ -483,14 +488,13 @@ function calculateGroupMode(totalAssetValue) {
             taxableAmount,
             tax,
         };
-    });
-
+     }).filter(Boolean); // 잘못된 항목 제거
+    
     // 결과 출력
     document.getElementById('result').innerHTML = `
-        <h3>계산 결과 (단체 상속)</h3>
-        ${heirs
-            .map(
-                (heir) => `
+        <h3>계산 결과 (전체 상속)</h3>
+        ${heirs.map(
+            (heir) => `
             <p>
                 <strong>${heir.name}</strong>: ${heir.shareAmount.toLocaleString()} 원<br>
                 공제 내역:<br>
@@ -501,9 +505,7 @@ function calculateGroupMode(totalAssetValue) {
                 과세 금액: ${heir.taxableAmount.toLocaleString()} 원<br>
                 상속세: ${heir.tax.toLocaleString()} 원
             </p>
-        `
-            )
-            .join('')}
+        `).join('')}
     `;
 }
 
@@ -530,35 +532,42 @@ function calculateBusinessPersonalMode(totalAssetValue) {
     `;
 }
 
-// 가업 단체 상속 계산 함수
+// 가업 단체 상속 로직
 function calculateBusinessGroupMode(totalAssetValue) {
-    const heirs = Array.from(document.querySelectorAll('.heir-entry')).map((heir, index) => {
-        const name = heir.querySelector('input[type="text"]').value || `상속인 ${index + 1}`;
-        const relationship = heir.querySelector('select').value || "기타";
-        const shareField = heir.querySelector('input[type="number"]');
-        const share = parseFloat(shareField.value) || 0;
+    const heirs = Array.from(document.querySelectorAll('.heir-entry')).map((heir) => {
+        const name = heir.querySelector('input[type="text"]').value || '상속인';
+        const relationship = heir.querySelector('select')?.value || 'other';
+        const sharePercentage = parseFloat(heir.querySelector('input[type="number"]').value || '0');
 
-        if (!shareField.value || share === 0) {
-            alert(`${name}의 상속 비율이 입력되지 않았습니다. 비율을 입력 후 다시 시도해주세요.`);
-            throw new Error("상속 비율 누락");
+        if (sharePercentage <= 0 || isNaN(sharePercentage)) {
+            console.error(`${name}의 상속 비율이 올바르지 않습니다.`);
+            return null; // 잘못된 항목 제외
         }
 
-        const heirAssetValue = (totalAssetValue * share) / 100;
-        const exemption = calculateTotalExemption(relationship, heirAssetValue);
-        const taxableAmount = Math.max(heirAssetValue - exemption, 0);
+        const shareAmount = (totalAssetValue * sharePercentage) / 100;
+        const exemption = calculateExemptions(shareAmount, relationship).totalExemption;
+        const taxableAmount = Math.max(shareAmount - exemption, 0);
         const tax = calculateTax(taxableAmount);
 
-        return { name, share, assetValue: heirAssetValue, exemption, taxableAmount, tax };
-    });
+        return {
+            name,
+            shareAmount,
+            exemption,
+            taxableAmount,
+            tax,
+        };
+    }).filter(Boolean); // 잘못된 항목 제거
 
-    const totalInheritedAssets = heirs.reduce((sum, heir) => sum + heir.assetValue, 0);
+    // 결과 출력
+    const totalInheritedAssets = heirs.reduce((sum, heir) => sum + heir.shareAmount, 0);
 
     document.getElementById('result').innerHTML = `
         <h3>계산 결과 (가업 단체 상속)</h3>
-        <p><strong>상속 재산 합계:</strong> ${formatNumberWithCommas(totalInheritedAssets.toString())} 원</p>
-        ${heirs.map(heir => `
+        <p><strong>상속 재산 합계:</strong> ${totalInheritedAssets.toLocaleString()} 원</p>
+        ${heirs.map(
+            (heir) => `
             <p>
-                <strong>${heir.name}</strong>: ${heir.assetValue.toLocaleString()} 원<br>
+                <strong>${heir.name}</strong>: ${heir.shareAmount.toLocaleString()} 원<br>
                 공제 금액: ${heir.exemption.toLocaleString()} 원<br>
                 과세 금액: ${heir.taxableAmount.toLocaleString()} 원<br>
                 상속세: ${heir.tax.toLocaleString()} 원
