@@ -12,7 +12,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBusinessGroupHeirButton = document.getElementById('addBusinessGroupHeirButton');
     const calculateButton = document.getElementById('calculateButton');
     const result = document.getElementById('result');
-  
+
+// 섹션 초기화 함수
+function resetSections() {
+    personalSection.style.display = 'none';
+    groupSection.style.display = 'none';
+    businessPersonalSection.style.display = 'none';
+    businessGroupSection.style.display = 'none';
+}
+
+// 초기 로딩 시 개인 상속을 기본값으로 설정
+function initializeDefaultView() {
+    resetSections();
+    personalSection.style.display = 'block'; // 개인 상속 섹션 기본값 표시
+}
+
+// 상속 유형 변경 이벤트 리스너
+inheritanceType.addEventListener('change', () => {
+    resetSections(); // 모든 섹션 숨김
+
+    switch (inheritanceType.value) {
+        case 'personal':
+            personalSection.style.display = 'block';
+            break;
+        case 'group':
+            groupSection.style.display = 'block';
+            break;
+        case 'businessPersonal':
+            businessPersonalSection.style.display = 'block';
+            break;
+        case 'businessGroup':
+            businessGroupSection.style.display = 'block';
+            break;
+        default:
+            console.error('잘못된 상속 유형 선택');
+            break;
+    }
+});
+
+// 초기화 호출
+initializeDefaultView();
+    
    // 자산 유형 변경 처리
     function handleAssetTypeChange(assetTypeSelect) {
         const assetEntry = assetTypeSelect.closest('.asset-entry');
@@ -161,123 +201,90 @@ document.addEventListener('input', () => {
         mixedTotalAmount.value = (total + cash + realEstate).toLocaleString(); // 총 금액 계산 및 콤마 추가
     }
 });
-
-// 섹션 초기화 함수
-function resetSections() {
-    personalSection.style.display = 'none';
-    groupSection.style.display = 'none';
-    businessPersonalSection.style.display = 'none';
-    businessGroupSection.style.display = 'none';
-}
-
-// 초기 로딩 시 개인 상속을 기본값으로 설정
-function initializeDefaultView() {
-    resetSections();
-    personalSection.style.display = 'block'; // 개인 상속 섹션 기본값 표시
-}
-
-initializeDefaultView(); // 초기화 호출
-
-// 상속 유형 변경 시
-inheritanceType.addEventListener('change', () => {
-    resetSections(); // 모든 섹션 숨김
-
-    switch (inheritanceType.value) {
-        case 'personal':
-            personalSection.style.display = 'block'; // 개인 상속 섹션 표시
-            break;
-        case 'group':
-            groupSection.style.display = 'block'; // 전체 상속 섹션 표시
-            break;
-        case 'businessPersonal':
-            businessPersonalSection.style.display = 'block'; // 가업 개인 상속 섹션 표시
-            break;
-        case 'businessGroup':
-            businessGroupSection.style.display = 'block'; // 가업 단체 상속 섹션 표시
-            break;
-        default:
-            console.error('잘못된 상속 유형 선택');
-            break;
-    }
-});
-   
+    
     // 계산 시 숫자만 추출
 function getNumericValue(field) {
     return parseFloat(field.value.replace(/[^0-9]/g, '')) || 0; // 숫자로 변환 (기본값 0)
 }
     
 // 상속 비율 입력값 검증 함수
-function validateSharePercentage() {
-    const percentageFields = Array.from(document.querySelectorAll('.sharePercentageField'));
-    const totalPercentage = percentageFields.reduce((sum, field) => {
-        const value = parseFloat(field.value) || 0;
-        return sum + value;
-    }, 0);
+    function validateSharePercentage() {
+        const percentageFields = Array.from(document.querySelectorAll('.sharePercentageField'));
+        const totalPercentage = percentageFields.reduce((sum, field) => {
+            const value = parseFloat(field.value) || 0;
+            return sum + value;
+        }, 0);
 
-    if (totalPercentage > 100) {
-        alert("상속 비율의 합이 100%를 초과할 수 없습니다.");
-        return false;
+        if (totalPercentage > 100) {
+            alert("상속 비율의 합이 100%를 초과할 수 없습니다.");
+            return false;
+        }
+
+        return true;
     }
 
-    return true;
-}
+    // 상속인 추가 버튼 이벤트
+    addHeirButton.addEventListener('click', () => {
+        const newHeirEntry = document.createElement('div');
+        newHeirEntry.className = 'heir-entry';
+        newHeirEntry.innerHTML = `
+            <input type="text" placeholder="이름">
+            <select>
+                <option value="spouse">배우자</option>
+                <option value="adultChild">자녀(성년)</option>
+                <option value="minorChild">자녀(미성년)</option>
+                <option value="parent">부모</option>
+                <option value="sibling">형제자매</option>
+                <option value="other">기타</option>
+            </select>
+            <input type="number" class="sharePercentageField" placeholder="상속 비율 (%)">
+        `;
 
-// 전체 상속: 상속인 추가 버튼 이벤트
-addHeirButton.addEventListener('click', () => {
-    const newHeirEntry = document.createElement('div');
-    newHeirEntry.className = 'heir-entry';
-    newHeirEntry.innerHTML = `
-        <input type="text" placeholder="이름">
-        <select>
-            <option value="spouse">배우자</option>
-            <option value="adultChild">자녀(성년)</option>
-            <option value="minorChild">자녀(미성년)</option>
-            <option value="parent">부모</option>
-            <option value="sibling">형제자매</option>
-            <option value="other">기타</option>
-        </select>
-        <input type="number" class="sharePercentageField" placeholder="상속 비율 (%)">
-    `;
+        // 새로 추가된 상속 비율 필드 이벤트 등록
+        const sharePercentageField = newHeirEntry.querySelector('.sharePercentageField');
+        sharePercentageField.addEventListener('input', () => {
+            const value = parseFloat(sharePercentageField.value) || 0;
 
-    // 상속 비율 입력 필드에 이벤트 연결
-    const percentageField = newHeirEntry.querySelector('.sharePercentageField');
-    percentageField.addEventListener('input', () => {
-        const numericValue = parseFloat(percentageField.value) || 0;
-        if (numericValue < 0 || numericValue > 100) {
-            alert('상속 비율은 0%에서 100% 사이여야 합니다.');
-            percentageField.value = '';
-        }
+            // 비율 검증: 범위 제한 (0~100)
+            if (value < 0 || value > 100) {
+                alert('상속 비율은 0%에서 100% 사이여야 합니다.');
+                sharePercentageField.value = ''; // 잘못된 입력 초기화
+                return;
+            }
 
-        // 전체 비율 검증
-        if (!validateSharePercentage()) {
-            percentageField.value = ''; // 잘못된 입력 초기화
-        }
+            // 전체 합 검증
+            if (!validateSharePercentage()) {
+                sharePercentageField.value = ''; // 잘못된 입력 초기화
+            }
+        });
+
+        heirContainer.appendChild(newHeirEntry);
     });
 
-    heirContainer.appendChild(newHeirEntry);
-});
+    // 기존 상속 비율 필드 이벤트 등록
+    document.querySelectorAll('.sharePercentageField').forEach((field) => {
+        field.addEventListener('input', () => {
+            const value = parseFloat(field.value) || 0;
 
-// 기존 상속 비율 필드에도 이벤트 연결
-document.querySelectorAll('.sharePercentageField').forEach((field) => {
-    field.addEventListener('input', () => {
-        const numericValue = parseFloat(field.value) || 0;
-        if (numericValue < 0 || numericValue > 100) {
-            alert('상속 비율은 0%에서 100% 사이여야 합니다.');
-            field.value = '';
-        }
+            // 비율 검증: 범위 제한 (0~100)
+            if (value < 0 || value > 100) {
+                alert('상속 비율은 0%에서 100% 사이여야 합니다.');
+                field.value = ''; // 잘못된 입력 초기화
+                return;
+            }
 
-        // 전체 비율 검증
-        if (!validateSharePercentage()) {
-            field.value = ''; // 잘못된 입력 초기화
-        }
+            // 전체 합 검증
+            if (!validateSharePercentage()) {
+                field.value = ''; // 잘못된 입력 초기화
+            }
+        });
     });
-});
 
 // 가업 단체 상속: 상속인 추가 버튼 이벤트
 addBusinessGroupHeirButton.addEventListener('click', () => {
     const newHeirEntry = document.createElement('div');
     newHeirEntry.className = 'heir-entry';
-    newHeirEntry.innerHTML = 
+    newHeirEntry.innerHTML = `
         <input type="text" placeholder="이름">
         <select>
             <option value="spouse">배우자</option>
@@ -288,7 +295,7 @@ addBusinessGroupHeirButton.addEventListener('click', () => {
             <option value="other">기타</option>
         </select>
         <input type="text" class="sharePercentage" placeholder="상속 비율 (%)">
-    ;
+    `;
     businessGroupHeirContainer.appendChild(newHeirEntry);
    });
 
@@ -296,7 +303,7 @@ addBusinessGroupHeirButton.addEventListener('click', () => {
 function createAssetEntry() {
     const newAsset = document.createElement('div');
     newAsset.className = 'asset-entry';
-    newAsset.innerHTML = 
+    newAsset.innerHTML = `
         <label>재산 유형:</label>
         <select class="assetType">
             <option value="cash">현금</option>
@@ -312,7 +319,7 @@ function createAssetEntry() {
             <input type="text" class="stockTotalField assetValue" placeholder="금액 (원)" style="display: none;" readonly>
             <input type="text" class="othersField assetValue" placeholder="금액 (원)" style="display: none;">
         </div>
-    ;
+    `;
     assetContainer.appendChild(newAsset);
 
     const assetTypeSelect = newAsset.querySelector('.assetType');
@@ -453,7 +460,7 @@ function calculatePersonalMode(totalAssetValue) {
     const tax = calculateTax(taxableAmount);
 
     // 결과 출력
-    document.getElementById('result').innerHTML = 
+    document.getElementById('result').innerHTML = `
         <h3>계산 결과 (개인 상속)</h3>
         <p>총 재산 금액: ${totalAssetValue.toLocaleString()} 원</p>
         <p><strong>공제 내역:</strong></p>
@@ -465,7 +472,7 @@ function calculatePersonalMode(totalAssetValue) {
         <p><strong>총 공제 금액:</strong> ${totalExemption.toLocaleString()} 원</p>
         <p>과세 금액: ${taxableAmount.toLocaleString()} 원</p>
         <p>상속세: ${tax.toLocaleString()} 원</p>
-    ;
+    `;
 }
 
 // 총 공제를 상세히 계산하는 함수
@@ -482,7 +489,7 @@ function calculateGroupMode(totalAssetValue) {
         const sharePercentage = parseFloat(heir.querySelector('input[type="number"]').value || '0');
 
         if (sharePercentage <= 0 || isNaN(sharePercentage)) {
-            console.error(${name}의 상속 비율이 올바르지 않습니다.);
+            console.error(`${name}의 상속 비율이 올바르지 않습니다.`);
             return null; // 잘못된 항목 제외
         }
 
@@ -502,10 +509,10 @@ function calculateGroupMode(totalAssetValue) {
      }).filter(Boolean); // 잘못된 항목 제거
     
     // 결과 출력
-    document.getElementById('result').innerHTML = 
+    document.getElementById('result').innerHTML = `
         <h3>계산 결과 (전체 상속)</h3>
         ${heirs.map(
-            (heir) => 
+            (heir) => `
             <p>
                 <strong>${heir.name}</strong>: ${heir.shareAmount.toLocaleString()} 원<br>
                 공제 내역:<br>
@@ -516,8 +523,8 @@ function calculateGroupMode(totalAssetValue) {
                 과세 금액: ${heir.taxableAmount.toLocaleString()} 원<br>
                 상속세: ${heir.tax.toLocaleString()} 원
             </p>
-        ).join('')}
-    ;
+        `).join('')}
+    `;
 }
 
   // 가업 개인 상속 계산 함수
@@ -534,25 +541,25 @@ function calculateBusinessPersonalMode(totalAssetValue) {
     const taxableAmount = Math.max(totalAssetValue - exemption, 0);
     const tax = calculateTax(taxableAmount);
 
-    document.getElementById('result').innerHTML = 
+    document.getElementById('result').innerHTML = `
         <h3>계산 결과 (가업 개인 상속)</h3>
         <p>총 재산 금액: ${formatNumberWithCommas(totalAssetValue.toString())} 원</p>
         <p>공제 금액: ${formatNumberWithCommas(exemption.toString())} 원</p>
         <p>과세 금액: ${formatNumberWithCommas(taxableAmount.toString())} 원</p>
         <p>상속세: ${formatNumberWithCommas(tax.toString())} 원</p>
-    ;
+    `;
 }
 
 // 가업 단체 상속 계산 함수
 function calculateBusinessGroupMode(totalAssetValue) {
     const heirs = Array.from(document.querySelectorAll('.heir-entry')).map((heir, index) => {
-        const name = heir.querySelector('input[type="text"]').value || 상속인 ${index + 1};
+        const name = heir.querySelector('input[type="text"]').value || `상속인 ${index + 1}`;
         const relationship = heir.querySelector('select').value || "기타";
         const shareField = heir.querySelector('input[type="number"]');
         const share = parseFloat(shareField.value) || 0;
 
         if (!shareField.value || share === 0) {
-            alert(${name}의 상속 비율이 입력되지 않았습니다. 비율을 입력 후 다시 시도해주세요.);
+            alert(`${name}의 상속 비율이 입력되지 않았습니다. 비율을 입력 후 다시 시도해주세요.`);
             throw new Error("상속 비율 누락");
         }
 
@@ -579,47 +586,46 @@ function calculateBusinessGroupMode(totalAssetValue) {
     // 결과 출력
     const totalInheritedAssets = heirs.reduce((sum, heir) => sum + heir.assetValue, 0);
 
-    document.getElementById('result').innerHTML = 
+    document.getElementById('result').innerHTML = `
         <h3>계산 결과 (가업 단체 상속)</h3>
         <p><strong>상속 재산 합계:</strong> ${formatNumberWithCommas(totalInheritedAssets.toString())} 원</p>
-        ${heirs.map(heir => 
+        ${heirs.map(heir => `
             <p>
                 <strong>${heir.name}</strong>: ${heir.assetValue.toLocaleString()} 원<br>
                 가업 공제 금액: ${heir.businessExemption.toLocaleString()} 원<br>
                 과세 금액: ${heir.taxableAmount.toLocaleString()} 원<br>
                 상속세: ${heir.tax.toLocaleString()} 원
             </p>
-        ).join('')}
-    ;
+        `).join('')}
+    `;
 }
 
+// 6. 계산 버튼 이벤트 (하단 배치)
+    calculateButton.addEventListener('click', () => {
+        const totalAssetValue = Array.from(document.querySelectorAll('.assetValue')).reduce((sum, field) => {
+            const value = parseInt(field.value.replace(/,/g, '') || '0', 10);
+            return sum + value;
+        }, 0);
+
+        switch (inheritanceType.value) {
+            case 'personal': // 개인 상속
+                calculatePersonalMode(totalAssetValue);
+                break;
+            case 'group': // 단체 상속
+                calculateGroupMode(totalAssetValue);
+                break;
+            case 'businessPersonal': // 가업 개인 상속
+                calculateBusinessPersonalMode(totalAssetValue);
+                break;
+            case 'businessGroup': // 가업 단체 상속
+                calculateBusinessGroupMode(totalAssetValue);
+                break;
+            default:
+                console.error('잘못된 계산 요청');
+                break;
+        }
+    });
     
-// 계산 버튼 이벤트
-document.getElementById('calculateButton').addEventListener('click', () => {
-    const totalAssetValue = Array.from(document.querySelectorAll('.assetValue')).reduce((sum, field) => {
-        const value = parseInt(field.value.replace(/,/g, '') || '0', 10);
-        return sum + value;
-    }, 0);
-
-    switch (inheritanceType.value) {
-        case 'personal': // 개인 상속
-            calculatePersonalMode(totalAssetValue);
-            break;
-        case 'group': // 단체 상속
-            calculateGroupMode(totalAssetValue);
-            break;
-        case 'businessPersonal': // 가업 개인 상속
-            calculateBusinessPersonalMode(totalAssetValue);
-            break;
-        case 'businessGroup': // 가업 단체 상속
-            calculateBusinessGroupMode(totalAssetValue);
-            break;
-        default:
-            console.error('잘못된 계산 요청');
-            break;
-    }
-});
-
 // 숫자 포맷 함수
 document.addEventListener('input', (event) => {
     const target = event.target;
