@@ -49,54 +49,61 @@ inheritanceType.addEventListener('change', () => {
             break;
     }
 });
+    
+     // 자산 유형 변경 처리
+    function handleAssetTypeChange(assetTypeSelect) {
+    const assetEntry = assetTypeSelect.closest('.asset-entry');
+    if (!assetEntry) {
+        console.error('assetTypeSelect의 상위 .asset-entry 요소를 찾을 수 없습니다.');
+        return; // 더 이상 진행하지 않음
+    }
 
-// 초기화 호출
+    const assetFields = assetEntry.querySelector('.assetFields');
+    const fields = {
+        cashField: assetFields.querySelector('.cashField'),
+        realEstateField: assetFields.querySelector('.realEstateField'),
+        stockQuantityField: assetFields.querySelector('.stockQuantityField'),
+        stockPriceField: assetFields.querySelector('.stockPriceField'),
+        stockTotalField: assetFields.querySelector('.stockTotalField'),
+        othersField: assetFields.querySelector('.othersField'),
+    };
+
+    // 모든 필드 숨기기 (기존 코드는 삭제됨)
+    Object.values(fields).forEach(field => {
+        if (field) field.style.display = 'none';
+    });
+
+    // 선택된 유형에 따라 표시
+    switch (assetTypeSelect.value) {
+        case 'cash':
+            fields.cashField.style.display = 'block';
+            break;
+        case 'realEstate':
+            fields.realEstateField.style.display = 'block';
+            break;
+        case 'stock':
+            fields.stockQuantityField.style.display = 'block';
+            fields.stockPriceField.style.display = 'block';
+            fields.stockTotalField.style.display = 'block';
+            break;
+        case 'others':
+            fields.othersField.style.display = 'block';
+            break;
+        default:
+            console.error('알 수 없는 자산 유형입니다:', assetTypeSelect.value);
+            break;
+    }
+}
+
+    // 모든 assetType에 이벤트 리스너 추가
+document.querySelectorAll('.assetType').forEach(select => {
+    select.addEventListener('change', () => handleAssetTypeChange(select));
+});
+
+    // 초기화 호출
 initializeDefaultView();
     
-   // 자산 유형 변경 처리
-    function handleAssetTypeChange(assetTypeSelect) {
-        const assetEntry = assetTypeSelect.closest('.asset-entry');
-        if (!assetEntry) {
-            console.error('assetTypeSelect의 상위 .asset-entry 요소를 찾을 수 없습니다.');
-            return; // 더 이상 진행하지 않음
-        }
-
-        const assetFields = assetEntry.querySelector('.assetFields');
-        const cashField = assetFields.querySelector('.cashField');
-        const realEstateField = assetFields.querySelector('.realEstateField');
-        const stockQuantityField = assetFields.querySelector('.stockQuantityField');
-        const stockPriceField = assetFields.querySelector('.stockPriceField');
-        const stockTotalField = assetFields.querySelector('.stockTotalField');
-        const othersField = assetFields.querySelector('.othersField');
-
-        // 모든 필드 숨기기
-        cashField.style.display = 'none';
-        realEstateField.style.display = 'none';
-        stockQuantityField.style.display = 'none';
-        stockPriceField.style.display = 'none';
-        stockTotalField.style.display = 'none';
-        othersField.style.display = 'none';
-
-        // 선택된 유형에 따라 표시
-        switch (assetTypeSelect.value) {
-            case 'cash':
-                cashField.style.display = 'block';
-                break;
-            case 'realEstate':
-                realEstateField.style.display = 'block';
-                break;
-            case 'stock':
-                stockQuantityField.style.display = 'block';
-                stockPriceField.style.display = 'block';
-                stockTotalField.style.display = 'block';
-                break;
-            case 'others':
-                othersField.style.display = 'block';
-                break;
-        }
-    }
-    
-  // "다시 하기" 버튼 이벤트 리스너
+ // "다시 하기" 버튼 이벤트 리스너
 document.querySelectorAll('.removeAssetButton').forEach((button) => {
     button.addEventListener('click', (event) => {
         event.preventDefault();
@@ -131,7 +138,7 @@ document.querySelectorAll('.removeAssetButton').forEach((button) => {
     });
 }); 
 
-    // 초기화: 모든 .assetValue 필드에 콤마 이벤트 등록
+      // 초기화: 모든 .assetValue 필드에 콤마 이벤트 등록
 document.querySelectorAll('.assetValue').forEach(addCommaFormatting);
 
 // 초기 주식 입력 필드에 콤마 이벤트 등록 (초기 필드)
@@ -140,7 +147,7 @@ if (initialStockPriceField) {
     addCommaFormatting(initialStockPriceField); // 초기 필드 이벤트 등록
 }
 
-// 재산 추가 버튼 클릭 이벤트
+    // 재산 추가 버튼 클릭 이벤트
 document.getElementById('addAssetButton').addEventListener('click', () => {
     createAssetEntry();
 
@@ -154,8 +161,38 @@ document.getElementById('addAssetButton').addEventListener('click', () => {
         newAssetTypeSelect.addEventListener('change', () => handleAssetTypeChange(newAssetTypeSelect));
     }
 });
+
+    // 재산 항목 생성
+function createAssetEntry() {
+    const newAsset = document.createElement('div');
+    newAsset.className = 'asset-entry';
+    newAsset.innerHTML = `
+        <label>재산 유형:</label>
+        <select class="assetType">
+            <option value="cash">현금</option>
+            <option value="realEstate">부동산</option>
+            <option value="stock">주식</option>
+            <option value="others">기타</option>
+        </select>
+        <div class="assetFields">
+            <input type="text" class="cashField assetValue" placeholder="금액 (원)" style="display: block;">
+            <input type="text" class="realEstateField assetValue" placeholder="평가액 (원)" style="display: none;">
+            <input type="number" class="stockQuantityField" placeholder="주식 수량" style="display: none;">
+            <input type="text" class="stockPriceField" placeholder="주당 가격 (원)" style="display: none;">
+            <input type="text" class="stockTotalField assetValue" placeholder="금액 (원)" style="display: none;" readonly>
+            <input type="text" class="othersField assetValue" placeholder="금액 (원)" style="display: none;">
+        </div>
+    `;
+
+    // 새롭게 생성된 항목을 DOM에 추가
+    assetContainer.appendChild(newAsset);
+
+     // 자산 유형 변경 이벤트 리스너 등록
+    const assetTypeSelect = newAsset.querySelector('.assetType');
+    assetTypeSelect.addEventListener('change', () => handleAssetTypeChange(assetTypeSelect));
+}
     
-// 숫자에 콤마를 추가하는 함수
+ // 숫자에 콤마를 추가하는 함수
 function formatNumberWithCommas(value) {
     return parseInt(value.replace(/[^0-9]/g, '') || '0', 10).toLocaleString();
 }
@@ -168,12 +205,7 @@ function addCommaFormatting(inputField) {
             inputField.value = formatNumberWithCommas(numericValue); // 콤마 추가
         }
     });
-}
-
-// 모든 assetType에 이벤트 리스너 추가
-document.querySelectorAll('.assetType').forEach(select => {
-    select.addEventListener('change', () => handleAssetTypeChange(select));
-});
+} 
 
 // 주식 총 금액 계산
 document.addEventListener('input', () => {
@@ -299,32 +331,6 @@ addBusinessGroupHeirButton.addEventListener('click', () => {
     businessGroupHeirContainer.appendChild(newHeirEntry);
    });
 
-// 재산 항목 생성
-function createAssetEntry() {
-    const newAsset = document.createElement('div');
-    newAsset.className = 'asset-entry';
-    newAsset.innerHTML = `
-        <label>재산 유형:</label>
-        <select class="assetType">
-            <option value="cash">현금</option>
-            <option value="realEstate">부동산</option>
-            <option value="stock">주식</option>
-            <option value="others">기타</option>
-        </select>
-        <div class="assetFields">
-            <input type="text" class="cashField assetValue" placeholder="금액 (원)" style="display: block;">
-            <input type="text" class="realEstateField assetValue" placeholder="평가액 (원)" style="display: none;">
-            <input type="number" class="stockQuantityField" placeholder="주식 수량" style="display: none;">
-            <input type="text" class="stockPriceField" placeholder="주당 가격 (원)" style="display: none;">
-            <input type="text" class="stockTotalField assetValue" placeholder="금액 (원)" style="display: none;" readonly>
-            <input type="text" class="othersField assetValue" placeholder="금액 (원)" style="display: none;">
-        </div>
-    `;
-    assetContainer.appendChild(newAsset);
-
-    const assetTypeSelect = newAsset.querySelector('.assetType');
-    assetTypeSelect.addEventListener('change', () => handleAssetTypeChange(assetTypeSelect));
-}
 
 // 재산 유형에 따라 필드를 동적으로 표시
 function handleAssetTypeChange(assetTypeSelect) {
