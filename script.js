@@ -433,7 +433,7 @@ function calculateExemptions(totalInheritance, relationship, spouseShare = 0, ch
             return { basicExemption, relationshipExemption: 0, totalExemption: 0 };
     }
 
-    // 🔹 일괄공제 수정 (6억 원 이상 적용 방지)
+    // 🔹 일괄공제 수정 (5억 원 이상 적용 방지)
     if (relationshipExemption < 500000000) {
         relationshipExemption = 500000000; // 최소 5억 원 보장
     }
@@ -492,13 +492,27 @@ document.addEventListener('input', () => {
     }
 });    
     
-// 개인 상속 로직
+// 개인 상속 로직 (수정됨)
 function calculatePersonalMode(totalAssetValue) {
     const relationship = document.getElementById('relationshipPersonal')?.value || 'other';
-    const spouseShare = totalAssetValue;
+    
+    // 🔹 배우자가 실제 상속받은 금액을 입력받도록 수정
+    let spouseShare = 0;
+    if (relationship === 'spouse') {
+        spouseShare = parseFloat(document.getElementById('spouseShare')?.value) || 0;
+    }
 
-    // 공제 계산
-    const { totalExemption, relationshipExemption } = calculateExemptions(totalAssetValue, relationship, spouseShare);
+    // 공제 계산 (배우자가 상속받은 금액 반영)
+    const { basicExemption, relationshipExemption } = calculateExemptions(totalAssetValue, relationship, spouseShare);
+
+    // 🔹 기초 공제는 항상 2억 원
+    const baseExemption = 200000000;
+
+    // 🔹 일괄공제 적용 (총 공제 금액이 5억 미만이면 5억 원 보장)
+    let totalExemption = baseExemption + relationshipExemption;
+    if (totalExemption < 500000000) {
+        totalExemption = 500000000;
+    }
 
     // 과세표준 계산
     const taxableAmount = Math.max(totalAssetValue - totalExemption, 0);
@@ -512,20 +526,14 @@ function calculatePersonalMode(totalAssetValue) {
         <p>총 재산 금액: ${totalAssetValue.toLocaleString()} 원</p>
         <p><strong>공제 내역:</strong></p>
         <ul>
-            <li>기본 공제: 500,000,000 원</li>
-            <li>기초 공제: 200,000,000 원</li>
+            <li>기초 공제: ${baseExemption.toLocaleString()} 원</li> 
             <li>관계 공제: ${relationshipExemption.toLocaleString()} 원 (${relationship})</li>
+            <li>일괄 공제 (5억 미만 시 적용): ${totalExemption.toLocaleString()} 원</li>
         </ul>
         <p><strong>총 공제 금액:</strong> ${totalExemption.toLocaleString()} 원</p>
         <p>과세 금액: ${taxableAmount.toLocaleString()} 원</p>
         <p>상속세: ${tax.toLocaleString()} 원</p>
     `;
-}
-
-// 총 공제를 상세히 계산하는 함수
-function calculateTotalExemptionDetailed(shareAmount, relationship, spouseShare = 0) {
-    const exemptions = calculateExemptions(shareAmount, relationship, spouseShare);
-    return exemptions;
 }
 
       // 전체 상속 계산 함수 - 단체상속용
