@@ -452,14 +452,18 @@ function calculateTaxableAmount(totalInheritance, exemptions) {
     return Math.max(totalInheritance - exemptions.totalExemption, 0); // 음수일 경우 0 처리
 }
 
-// 누진세율 적용 함수
+/**
+ * 누진세율 계산 함수
+ * @param {number} taxableAmount - 과세 금액
+ * @returns {number} 상속세 금액
+ */
 function calculateTax(taxableAmount) {
-    
     const taxBrackets = [
-        { limit: 200000000, rate: 0.1 }, // 2억 이하
-        { limit: 500000000, rate: 0.2 }, // 5억 이하
-        { limit: 1000000000, rate: 0.3 }, // 10억 이하
-        { limit: Infinity, rate: 0.4 }, // 10억 초과
+        { limit: 100000000, rate: 0.1 },   // 1억 이하: 10%
+        { limit: 500000000, rate: 0.2 },   // 1억 초과 ~ 5억: 20%
+        { limit: 1000000000, rate: 0.3 },  // 5억 초과 ~ 10억: 30%
+        { limit: 3000000000, rate: 0.4 },  // 10억 초과 ~ 30억: 40%
+        { limit: Infinity, rate: 0.5 },    // 30억 초과: 50%
     ];
 
     let tax = 0;
@@ -475,7 +479,7 @@ function calculateTax(taxableAmount) {
         }
     }
 
-    return Math.max(tax, 0);
+    return Math.max(tax, 0); // 음수 방지
 }
 
 // 주식 총액을 assetValue에 포함
