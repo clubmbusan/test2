@@ -499,7 +499,10 @@ function calculatePersonalMode(totalAssetValue) {
     // 🔹 배우자가 실제 상속받은 금액을 입력받도록 수정
     let spouseShare = 0;
     if (relationship === 'spouse') {
-        spouseShare = parseFloat(document.getElementById('spouseShare')?.value) || 0;
+        let spouseInput = document.getElementById('spouseShare');
+        if (spouseInput) {
+            spouseShare = parseFloat(spouseInput.value) || 0;
+        }
     }
 
     // 공제 계산 (배우자가 상속받은 금액 반영)
@@ -508,6 +511,7 @@ function calculatePersonalMode(totalAssetValue) {
     // 🔹 배우자 추가 공제 (최대 30억)
     let extraExemption = 0;
     if (relationship === 'spouse') {
+        relationshipExemption = 5000000000; // 배우자 기본 공제 5억 적용
         extraExemption = Math.min(spouseShare, 3000000000); // 배우자 추가 공제 (최대 30억)
     }
 
@@ -533,7 +537,7 @@ function calculatePersonalMode(totalAssetValue) {
     console.log("총 재산 금액:", totalAssetValue);
     console.log("배우자 상속분:", spouseShare);
     console.log("기초 공제:", baseExemption);
-    console.log("관계 공제:", relationshipExemption);
+    console.log("관계 공제 (최종):", relationshipExemption);
     console.log("추가 공제:", extraExemption);
     console.log("최종 공제 금액:", totalExemption);
     console.log("과세 금액:", taxableAmount);
