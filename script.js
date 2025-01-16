@@ -516,7 +516,7 @@ function calculatePersonalMode(totalAssetValue) {
         <p>총 재산 금액: ${totalAssetValue.toLocaleString()} 원</p>
         <p><strong>공제 내역:</strong></p>
         <ul>
-            <li>기본 공제: 600,000,000 원</li>
+            <li>기본 공제: 500,000,000 원</li>
             <li>기초 공제: 200,000,000 원</li>
             <li>관계 공제: ${relationshipExemption.toLocaleString()} 원 (${relationship})</li>
         </ul>
@@ -577,8 +577,8 @@ function calculateGroupMode(totalAssetValue) {
                 <p>
                     <strong>${heir.name}</strong>: ${heir.shareAmount.toLocaleString()} 원<br>
                     공제 내역:<br>
-                    - 기본 공제: ${heir.exemptions.basicExemption.toLocaleString()} 원<br>
                     - 기초 공제: ${heir.exemptions.relationshipExemption.toLocaleString()} 원<br>
+                    - 기본 공제: ${heir.exemptions.basicExemption.toLocaleString()} 원<br>
                     총 공제 금액: ${heir.exemptions.totalExemption.toLocaleString()} 원<br>
                     과세 금액: ${heir.taxableAmount.toLocaleString()} 원<br>
                     상속세: ${heir.tax.toLocaleString()} 원
