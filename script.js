@@ -511,7 +511,7 @@ function calculatePersonalMode(totalAssetValue) {
     // 🔹 배우자 추가 공제 (최대 30억)
     let extraExemption = 0;
     if (relationship === 'spouse') {
-        relationshipExemption = 5000000000; // 배우자 기본 공제 5억 적용
+        relationshipExemption = 500000000; // 배우자 기본 공제 5억 적용
         extraExemption = Math.min(spouseShare, 3000000000); // 배우자 추가 공제 (최대 30억)
     }
 
