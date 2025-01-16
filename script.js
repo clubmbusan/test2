@@ -402,44 +402,40 @@ function calculateExemptions(totalInheritance, relationship, spouseShare = 0, ch
     let relationshipExemption = 0;
 
     // 기초공제 및 관계공제 계산
-    if (totalInheritance < 5000000000) {  // 기초 공제액이 5억 원 이하일 경우
+    if (totalInheritance < 5000000000) {  
         relationshipExemption += basicExemption;
-    } else { // 기본 공제가 아닌 일괄공제가 적용되므로 5억 원을 공제
+    } else { 
         relationshipExemption += Math.min(5000000000, totalInheritance);
     }
 
     switch (relationship) {
         case 'spouse': 
-            // 배우자 공제
-            relationshipExemption += Math.min(spouseShare, totalInheritance * 0.5, 3500000000); // 배우자 공제
+            // 🔹 배우자 공제 수정 (최대 30억 원까지만 적용)
+            relationshipExemption += Math.min(spouseShare, 3000000000);  
             break;
         case 'adultChild': 
-            // 성년 자녀 공제
             relationshipExemption += 50000000; // 성년 자녀 공제 (5천만 원)
             break;
         case 'minorChild': 
-            // 미성년 자녀 공제
             if (isMinorChild) {
-                relationshipExemption += 1000000; // 미성년 자녀 공제 (천만 원)
+                relationshipExemption += 10000000; // 미성년 자녀 공제 (천만 원)
             }
             break;
         case 'parent': 
-            // 부모 공제
-            relationshipExemption += 100000000; // 부모 공제
+            relationshipExemption += 100000000; // 부모 공제 (1억 원)
             break;
         case 'sibling':
         case 'other':
-            // 기타 공제
-            relationshipExemption += 10000000; // 기타 공제
+            relationshipExemption += 10000000; // 기타 공제 (천만 원)
             break;
         default:
             console.error('잘못된 관계 선택:', relationship);
             return { basicExemption, relationshipExemption: 0, totalExemption: 0 };
     }
 
-    // 일괄공제 적용 (기초공제와 관계공제를 합한 것이 6억을 초과할 경우)
+    // 🔹 일괄공제 수정 (6억 원 이상 적용 방지)
     if (relationshipExemption < 500000000) {
-        relationshipExemption += 500000000 - relationshipExemption; // 6억 원 이하일 경우 일괄공제 적용
+        relationshipExemption = 500000000; // 최소 5억 원 보장
     }
 
     const totalExemption = relationshipExemption;
