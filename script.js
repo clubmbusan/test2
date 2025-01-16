@@ -402,10 +402,10 @@ function calculateExemptions(totalInheritance, relationship, spouseShare = 0, ch
     let relationshipExemption = 0;
 
     // 기초공제 및 관계공제 계산
-    if (totalInheritance < 5000000000) {  
+    if (totalInheritance < 500000000) {  
         relationshipExemption += basicExemption;
     } else { 
-        relationshipExemption += Math.min(5000000000, totalInheritance);
+        relationshipExemption += Math.min(500000000, totalInheritance);
     }
 
     switch (relationship) {
