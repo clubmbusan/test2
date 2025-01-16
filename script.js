@@ -503,12 +503,17 @@ function calculatePersonalMode(totalAssetValue) {
     }
 
     // 공제 계산 (배우자가 상속받은 금액 반영)
-    const { basicExemption, relationshipExemption } = calculateExemptions(totalAssetValue, relationship, spouseShare);
+    let { basicExemption, relationshipExemption } = calculateExemptions(totalAssetValue, relationship, spouseShare);
+
+    // 🔹 배우자 관계 공제 = 5억 + 추가 공제(배우자 상속분 내 최대 30억)
+    if (relationship === 'spouse') {
+        relationshipExemption += Math.min(spouseShare, 3000000000); // 배우자 추가 공제 (최대 30억)
+    }
 
     // 🔹 기초 공제는 항상 2억 원
     const baseExemption = 200000000;
 
-    // 🔹 일괄공제 적용 (총 공제 금액이 5억 미만이면 5억 원 보장)
+    // 🔹 일괄공제 적용 (기초 + 관계 공제가 5억 미만이면 5억으로 보정)
     let totalExemption = baseExemption + relationshipExemption;
     if (totalExemption < 500000000) {
         totalExemption = 500000000;
