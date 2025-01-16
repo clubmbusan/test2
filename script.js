@@ -505,17 +505,20 @@ function calculatePersonalMode(totalAssetValue) {
     // 공제 계산 (배우자가 상속받은 금액 반영)
     let { basicExemption, relationshipExemption } = calculateExemptions(totalAssetValue, relationship, spouseShare);
 
-    // 🔹 배우자 관계 공제 = 5억 + 추가 공제(배우자 상속분 내 최대 30억)
+    // 🔹 배우자 추가 공제 (최대 30억)
+    let extraExemption = 0;
     if (relationship === 'spouse') {
-        relationshipExemption += Math.min(spouseShare, 3000000000); // 배우자 추가 공제 (최대 30억)
+        extraExemption = Math.min(spouseShare, 3000000000); // 배우자 추가 공제 (최대 30억)
     }
 
     // 🔹 기초 공제는 항상 2억 원
     const baseExemption = 200000000;
 
-    // 🔹 일괄공제 적용 (기초 + 관계 공제가 5억 미만이면 5억으로 보정)
-    let totalExemption = baseExemption + relationshipExemption;
-    if (totalExemption < 500000000) {
+    // 🔹 최종 공제 금액 계산
+    let totalExemption = baseExemption + relationshipExemption + extraExemption;
+
+    // 🔹 배우자가 아닌 경우 최소 5억 공제 보장 (일괄 공제 적용)
+    if (relationship !== 'spouse' && totalExemption < 500000000) {
         totalExemption = 500000000;
     }
 
@@ -525,6 +528,17 @@ function calculatePersonalMode(totalAssetValue) {
     // 상속세 계산
     const tax = calculateTax(taxableAmount);
 
+    // 🔹 콘솔 로그로 디버깅
+    console.log("🔍 Debug Info:");
+    console.log("총 재산 금액:", totalAssetValue);
+    console.log("배우자 상속분:", spouseShare);
+    console.log("기초 공제:", baseExemption);
+    console.log("관계 공제:", relationshipExemption);
+    console.log("추가 공제:", extraExemption);
+    console.log("최종 공제 금액:", totalExemption);
+    console.log("과세 금액:", taxableAmount);
+    console.log("상속세:", tax);
+
     // 결과 출력
     document.getElementById('result').innerHTML = `
         <h3>계산 결과 (개인 상속)</h3>
@@ -533,9 +547,9 @@ function calculatePersonalMode(totalAssetValue) {
         <ul>
             <li>기초 공제: ${baseExemption.toLocaleString()} 원</li> 
             <li>관계 공제: ${relationshipExemption.toLocaleString()} 원 (${relationship})</li>
-            <li>일괄 공제 (5억 미만 시 적용): ${totalExemption.toLocaleString()} 원</li>
+            <li>추가 공제: ${extraExemption.toLocaleString()} 원</li>
         </ul>
-        <p><strong>총 공제 금액:</strong> ${totalExemption.toLocaleString()} 원</p>
+        <p><strong>최종 공제 금액:</strong> ${totalExemption.toLocaleString()} 원</p>
         <p>과세 금액: ${taxableAmount.toLocaleString()} 원</p>
         <p>상속세: ${tax.toLocaleString()} 원</p>
     `;
