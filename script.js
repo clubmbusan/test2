@@ -426,21 +426,11 @@ addAssetButton.addEventListener('click', createAssetEntry);
 function calculateExemptions(totalInheritance, relationship, spouseShare = 0, parentAge = 0, minorChildAge = 0) {
     const basicExemption = 200000000; // 기초 공제 (2억 원)
     let relationshipExemption = 0;
-    let extraExemption = 0;
 
     switch (relationship) {
         case 'spouse': 
-            // ✅ 배우자 공제: 기본 5억 + 추가 공제 (최대 30억)
+            // ✅ 배우자 공제: 기본 5억 (추가 공제는 최종 공제에서 반영)
             relationshipExemption = 500000000;  
-            
-            // 🔹 배우자 추가 공제 계산 (음수 방지)
-            if (spouseShare > 500000000) {
-                extraExemption = Math.min(spouseShare - 500000000, 3000000000); // 배우자가 실제 상속받은 금액 반영
-            } else {
-                extraExemption = 0; // 배우자가 상속받은 금액이 5억 이하라면 추가 공제 없음
-            }
-            
-            relationshipExemption += extraExemption; 
             break;
             
         case 'adultChild': 
@@ -449,11 +439,8 @@ function calculateExemptions(totalInheritance, relationship, spouseShare = 0, pa
             
         case 'minorChild': 
             // ✅ 미성년 자녀 공제: 기본 1천만 원 + 성인 될 때까지 연 1천만 원 추가 공제
-            const currentYear = new Date().getFullYear(); // 현재 연도
-            const yearsUntilAdult = Math.max(19 - minorChildAge, 0); // 성인될 때까지 남은 연도
-            extraExemption = yearsUntilAdult * 10000000; // 연 1천만 원씩 추가 공제
-            relationshipExemption = 10000000; // 기본 미성년 공제
-            relationshipExemption += extraExemption; // 추가 공제 반영
+            const yearsUntilAdult = Math.max(19 - minorChildAge, 0); // 성인이 될 때까지 남은 연도
+            relationshipExemption = 10000000 + (yearsUntilAdult * 10000000); // 기본 공제(1천만 원) + 추가 공제
             break;
             
         case 'parent': 
@@ -468,16 +455,10 @@ function calculateExemptions(totalInheritance, relationship, spouseShare = 0, pa
             
         default:
             console.error('잘못된 관계 선택:', relationship);
-            return { basicExemption, relationshipExemption: 0, extraExemption: 0, totalExemption: 0 };
+            return { basicExemption, relationshipExemption, totalExemption: 0 };
     }
 
-    // ✅ 최종 공제 계산: 기초공제 + 관계공제 + 추가 공제 후 5억 미만이면 5억으로 보장
-    let totalExemption = basicExemption + relationshipExemption;
-    if (totalExemption < 500000000) {
-        totalExemption = 500000000;
-    }
-
-    return { basicExemption, relationshipExemption, extraExemption, totalExemption };
+    return { basicExemption, relationshipExemption };
 }
 
 // 과세표준 계산 함수
@@ -530,7 +511,8 @@ document.addEventListener('input', () => {
 });    
 
      // 개인 상속 계산 함수
-      function calculatePersonalMode(totalAssetValue) {
+     // 개인 상속 계산 함수
+function calculatePersonalMode(totalAssetValue) {
     const relationship = document.getElementById('relationshipPersonal')?.value || 'other';
     
     // ✅ 배우자 상속분 가져오기
@@ -554,13 +536,22 @@ document.addEventListener('input', () => {
         minorChildAge = parseInt(minorChildAgeInput.value) || 0;
     }
 
-    // ✅ 공제 계산 (배우자 추가 공제 포함)
-    let { basicExemption, relationshipExemption, extraExemption, totalExemption } = calculateExemptions(
+    // ✅ 공제 계산
+    let { basicExemption, relationshipExemption } = calculateExemptions(
         totalAssetValue, relationship, spouseShare, parentAge, minorChildAge
     );
 
-    // ✅ 최종 공제에서 최소 5억 보장
-    if (totalExemption < 500000000) {
+    // ✅ 배우자의 경우 추가 공제 반영
+    let totalExemption = basicExemption + relationshipExemption;
+    if (relationship === 'spouse') {
+        let spouseAdditionalExemption = Math.min(spouseShare - 700000000, 2300000000); // 기초 2억 + 관계 5억 후 추가 공제
+        if (spouseAdditionalExemption > 0) {
+            totalExemption += spouseAdditionalExemption;
+        }
+    }
+
+    // ✅ 배우자가 아닐 경우 최종 공제 5억 미만이면 5억 보장
+    if (relationship !== 'spouse' && totalExemption < 500000000) {
         totalExemption = 500000000;
     }
 
@@ -578,7 +569,6 @@ document.addEventListener('input', () => {
     console.log("미성년 자녀 나이:", minorChildAge);
     console.log("기초 공제:", basicExemption);
     console.log("관계 공제:", relationshipExemption);
-    console.log("추가 공제:", extraExemption);
     console.log("최종 공제 금액:", totalExemption);
     console.log("과세 금액:", taxableAmount);
     console.log("상속세:", tax);
@@ -591,14 +581,12 @@ document.addEventListener('input', () => {
         <ul>
             <li>기초 공제: ${basicExemption.toLocaleString()} 원</li> 
             <li>관계 공제: ${relationshipExemption.toLocaleString()} 원 (${relationship})</li>
-            <li>추가 공제: ${extraExemption.toLocaleString()} 원</li>
         </ul>
         <p><strong>최종 공제 금액:</strong> ${totalExemption.toLocaleString()} 원</p>
         <p>과세 금액: ${taxableAmount.toLocaleString()} 원</p>
         <p>상속세: ${tax.toLocaleString()} 원</p>
     `;
 }
-
 
       // 전체 상속 계산 함수 - 단체상속용
 function calculateGroupMode(totalAssetValue) {
