@@ -49,7 +49,33 @@ inheritanceType.addEventListener('change', () => {
             break;
     }
 });
-    
+
+    // ✅ 개인 상속의 부모 연령 선택 필드 표시
+const relationshipSelect = document.getElementById("relationshipPersonal");
+const parentAgeContainer = document.getElementById("parentAgeContainer");
+
+if (relationshipSelect) {
+    relationshipSelect.addEventListener("change", function () {
+        if (this.value === "parent") {
+            parentAgeContainer.style.display = "inline-block"; // 부모 선택 시 연령 필드 표시
+        } else {
+            parentAgeContainer.style.display = "none"; // 다른 관계 선택 시 숨김
+        }
+    });
+}
+
+// ✅ 전체 상속의 부모 연령 선택 필드 표시 (각 상속인별 개별 적용)
+document.addEventListener("change", function (event) {
+    if (event.target.classList.contains("relationship")) {
+        const parentAgeField = event.target.parentElement.querySelector(".parentAgeField");
+        if (event.target.value === "parent") {
+            parentAgeField.style.display = "inline-block"; // 부모 선택 시 해당 상속인의 필드만 표시
+        } else {
+            parentAgeField.style.display = "none"; // 다른 관계 선택 시 숨김
+        }
+    }
+});
+
      // 자산 유형 변경 처리
     function handleAssetTypeChange(assetTypeSelect) {
     const assetEntry = assetTypeSelect.closest('.asset-entry');
@@ -255,22 +281,22 @@ function getNumericValue(field) {
         return true;
     }
 
-    // 상속인 추가 버튼 이벤트
+      // 상속인 추가 버튼 이벤트
     addHeirButton.addEventListener('click', () => {
         const newHeirEntry = document.createElement('div');
         newHeirEntry.className = 'heir-entry';
         newHeirEntry.innerHTML = `
-            <input type="text" placeholder="이름">
-            <select>
-                <option value="spouse">배우자</option>
-                <option value="adultChild">자녀(성년)</option>
-                <option value="minorChild">자녀(미성년)</option>
-                <option value="parent">부모</option>
-                <option value="sibling">형제자매</option>
-                <option value="other">기타</option>
-            </select>
-            <input type="number" class="sharePercentageField" placeholder="상속 비율 (%)">
-        `;
+          <input type="text" placeholder="이름">
+        <select class="relationship">
+            <option value="spouse">배우자</option>
+            <option value="adultChild">자녀(성년)</option>
+            <option value="minorChild">자녀(미성년)</option>
+            <option value="parent">부모</option>
+            <option value="sibling">형제자매</option>
+            <option value="other">기타</option>
+        </select>
+        <input type="number" class="sharePercentageField" placeholder="상속 비율 (%)">
+    `;
 
         // 새로 추가된 상속 비율 필드 이벤트 등록
         const sharePercentageField = newHeirEntry.querySelector('.sharePercentageField');
@@ -396,51 +422,51 @@ function handleAssetTypeChange(assetTypeSelect) {
 // 재산 추가 버튼 이벤트
 addAssetButton.addEventListener('click', createAssetEntry);    
 
- // 공제 계산 로직 (배우자 공제 정상 적용)
-function calculateExemptions(totalInheritance, relationship, spouseShare = 0, childrenCount = 0, isMinorChild = false) {
+ // 공제 계산 로직 (부모 공제 연령별 차등 적용)
+function calculateExemptions(totalInheritance, relationship, spouseShare = 0, parentAge = 0) {
     const basicExemption = 200000000; // 기초 공제 (2억 원)
     let relationshipExemption = 0;
+    let extraExemption = 0;
 
-    // 🔹 관계별 공제 적용
     switch (relationship) {
         case 'spouse': 
             // 배우자 기본 공제 (5억) + 추가 공제 (최대 30억)
-            relationshipExemption = 500000000; // 기본 5억 적용
-            if (spouseShare > 0) {
-                relationshipExemption += Math.min(spouseShare - 500000000, 3000000000);  
+            relationshipExemption = 500000000;  
+            if (spouseShare > 500000000) {
+                extraExemption = Math.min(spouseShare - 500000000, 3000000000); 
             }
+            relationshipExemption += extraExemption;
+            break;
+        case 'parent': 
+            // 부모 연령별 공제 (60세 미만: 5천만 원, 60세 이상: 1억 원)
+            relationshipExemption = parentAge >= 60 ? 100000000 : 50000000;
             break;
         case 'adultChild': 
             relationshipExemption = 50000000; // 성년 자녀 공제 (5천만 원)
             break;
         case 'minorChild': 
-            if (isMinorChild) {
-                relationshipExemption = 10000000; // 미성년 자녀 공제 (천만 원)
-            }
-            break;
-        case 'parent': 
-            relationshipExemption = 100000000; // 부모 공제 (1억 원)
+            relationshipExemption = 10000000; // 미성년 자녀 공제 (천만 원)
             break;
         case 'sibling':
         case 'other':
-            relationshipExemption = 10000000; // 기타 공제 (천만 원)
+            relationshipExemption = 10000000; // 기타 상속인 (1천만 원)
             break;
         default:
             console.error('잘못된 관계 선택:', relationship);
             return { basicExemption, relationshipExemption: 0, totalExemption: 0 };
     }
 
-    // 🔹 배우자가 아닐 경우, 일괄공제 적용 (5억 보장)
+    // 배우자가 아닌 경우 최소 5억 공제 보장 (일괄공제)
     if (relationship !== 'spouse' && relationshipExemption < 500000000) {
-        relationshipExemption = 500000000; // 최소 5억 원 보장
+        relationshipExemption = 500000000;
     }
 
-    // 🔹 최종 공제 금액 계산
+    // 최종 공제 금액 계산
     const totalExemption = basicExemption + relationshipExemption;
 
-    return { basicExemption, relationshipExemption, totalExemption };
+    return { basicExemption, relationshipExemption, extraExemption, totalExemption };
 }
-  
+
 // 과세표준 계산 함수
 function calculateTaxableAmount(totalInheritance, exemptions) {
     return Math.max(totalInheritance - exemptions.totalExemption, 0); // 음수일 경우 0 처리
