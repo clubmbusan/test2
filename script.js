@@ -69,39 +69,28 @@ if (relationshipSelect && minorChildAgeContainer) {
     });
 }
 
-/**
- * 부모 선택 시 연령 입력 필드 표시, 미성년자 선택 시 나이 입력 필드 표시
- */
-function updateDynamicFields(event) {
-    if (!event.target.classList.contains("relationship")) return;
+// ✅ 전체 상속의 부모 연령 선택 필드 (기존 코드 유지)
+document.getElementById("heirContainer").addEventListener("change", function (event) {
+    if (event.target.classList.contains("relationship")) {
+        const heirEntry = event.target.closest('.heir-entry');
+        const parentAgeField = heirEntry?.querySelector(".parentAgeField");
 
-    const heirEntry = event.target.closest(".heir-entry");
-    if (!heirEntry) return;
-
-    const parentAgeField = heirEntry.querySelector(".parentAgeField");
-    const minorChildAgeField = heirEntry.querySelector(".minorChildAgeField");
-
-    if (parentAgeField) {
-        parentAgeField.style.display = event.target.value === "parent" ? "inline-block" : "none";
+        if (parentAgeField) {
+            parentAgeField.style.display = event.target.value === "parent" ? "inline-block" : "none";
+        }
     }
-
-    if (minorChildAgeField) {
-        minorChildAgeField.style.display = event.target.value === "minorChild" ? "block" : "none";
-    }
-}
-
-// ✅ 기존 필드에 대해 초기 이벤트 리스너 등록
-document.querySelectorAll(".relationship").forEach(select => {
-    select.addEventListener("change", updateDynamicFields);
 });
 
-// ✅ 새로 추가된 상속인 필드에도 이벤트 리스너 등록
-document.getElementById("addHeirButton").addEventListener("click", function () {
-    setTimeout(() => {
-        document.querySelectorAll(".relationship").forEach(select => {
-            select.addEventListener("change", updateDynamicFields);
-        });
-    }, 100); // DOM 업데이트 후 실행
+// ✅ 전체 상속: 미성년 자녀 나이 입력 필드 추가 (수정된 코드)
+document.getElementById("heirContainer").addEventListener("change", function (event) {
+    if (event.target.classList.contains("relationship")) {
+        const heirEntry = event.target.closest(".heir-entry");
+        const minorChildAgeField = heirEntry?.querySelector(".minorChildAgeField");
+
+        if (minorChildAgeField) {
+            minorChildAgeField.style.display = event.target.value === "minorChild" ? "block" : "none";
+        }
+    }
 });
    
      // 자산 유형 변경 처리
