@@ -812,7 +812,6 @@ function calculateGroupMode() {
         <h3>최종 상속세 합계: ${totalInheritanceTax.toLocaleString()} 원</h3>  
     `;
 }
-
                   
  /**                  
  * ✅ 법정 상속 계산 함수 (민법에 따른 법정 상속 비율 자동 적용)
