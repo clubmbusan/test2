@@ -800,20 +800,30 @@ if (isNaN(lumpSumExemption) || lumpSumExemption < 0) {
 // ✅ 배우자 제외한 상속인의 개수 계산 (🚀 필수 추가!)
 let nonSpouseHeirs = heirs.filter(h => h.relationship !== 'spouse').length;
 
-// ✅ 배우자 제외한 상속인의 기초 공제 + 관계 공제 총합 계산   
+// ✅ 배우자 제외한 상속인의 총 공제 합 계산 (배우자 이월 공제 & 금융재산 공제 제외)
 let totalNonSpouseExemptions = heirs.reduce((sum, heir) => {
     if (heir.relationship !== "spouse") {
-        return sum + (heir.relationshipExemption || 0) + ((totalBasicExemption * (heir.sharePercentage || 0)) / 100);
+        let basicExemption = (totalBasicExemption * heir.sharePercentage) / 100; // 기초 공제
+        let relationshipExemption = heir.relationshipExemption || 0; // 관계 공제
+
+        return sum + basicExemption + relationshipExemption; 
     }
     return sum;
 }, 0);
 
-// ✅ 일괄 공제 보정 계산 (배우자 제외 상속인들의 지분 비율에 따라 배분)
-maxIndividualLumpSumExemption = (nonSpouseHeirs > 0) ? lumpSumExemption / nonSpouseHeirs : 0;
+// ✅ 부족한 부분을 보정하여 "기초 공제 + 관계 공제 + 일괄 공제 보정액" 총합이 5억이 되도록 조정
+let correctedLumpSumExemption = Math.max(500000000 - totalNonSpouseExemptions, 0);
 
-// ✅ 상속인 개별 데이터에 일괄 공제 반영
+// ✅ 배우자 제외한 상속인의 총 지분 계산
+let totalNonSpouseShare = heirs.reduce((sum, heir) => {
+    return heir.relationship !== "spouse" ? sum + heir.sharePercentage : sum;
+}, 0);
+
+// ✅ 부족한 일괄 공제를 배우자 제외한 상속인들의 지분 비율에 따라 배분
 heirs = heirs.map((heir) => {
-    let individualLumpSumExemption = (heir.relationship !== 'spouse') ? (maxIndividualLumpSumExemption * heir.sharePercentage) : 0;
+    let individualLumpSumExemption = (heir.relationship !== "spouse") 
+        ? (correctedLumpSumExemption * heir.sharePercentage) / totalNonSpouseShare 
+        : 0;
 
     return {
         ...heir,
@@ -821,6 +831,44 @@ heirs = heirs.map((heir) => {
     };
 });
 
+// ✅ 확인 로그 추가 (일괄 공제 보정값이 5억이 되는지 확인)
+console.log("📌 보정된 일괄 공제 총합:", correctedLumpSumExemption); 
+
+ // ✅ 배우자 관련 변수를 먼저 선언하여 어디서든 접근 가능하도록 수정
+let spouseInheritanceAmount = 0;
+let spouseFinancialExemption = 0;
+let spouseBasicExemption = 0;
+let spouseRelationshipExemption = 500000000; // 배우자 관계 공제 (5억)
+
+// ✅ 배우자가 있을 경우, 실제 상속 금액 계산
+if (spouse) {
+    spouseInheritanceAmount = (totalAssetValue * spouse.sharePercentage) / 100;
+    spouseFinancialExemption = (maxFinancialExemption * spouse.sharePercentage) / 100;
+    spouseBasicExemption = (totalBasicExemption * spouse.sharePercentage) / 100;
+
+    let spouseExcessAmount = Math.max(spouseInheritanceAmount - spouseRelationshipExemption, 0);
+    let spouseAdditionalExemption = Math.min(spouseExcessAmount * 0.5, 3000000000);
+
+    spouseExemptions.additionalExemption = spouseAdditionalExemption;
+
+    let spouseRemainingAmount = spouseInheritanceAmount - spouseFinancialExemption - spouseBasicExemption - spouseRelationshipExemption;
+    spouseRemainingAmount = Math.max(spouseRemainingAmount, 0);
+
+    if (spouseRemainingAmount > 0 && spouse.sharePercentage < 100) {
+        spouseExemptions.additionalExemption = Math.min(spouseRemainingAmount * 0.5, 3000000000);
+    }
+}
+
+// ✅ 배우자의 과세 표준을 올바르게 계산 (한 번만 계산하고 저장)
+let spouseFinalTaxableAmount = spouseInheritanceAmount  
+                               - spouseFinancialExemption 
+                               - spouseBasicExemption 
+                               - spouseRelationshipExemption 
+                               - spouseExemptions.additionalExemption;
+
+// ✅ 과세표준이 음수가 되지 않도록 최소값 0으로 보정
+spouseFinalTaxableAmount = Math.max(spouseFinalTaxableAmount, 0);
+    
 // ✅ 개별 상속인 데이터 가공
 let processedHeirs = heirs?.map((heir) => {
     const shareAmount = (totalAssetValue * heir.sharePercentage) / 100;
@@ -837,9 +885,9 @@ let processedHeirs = heirs?.map((heir) => {
         shareAmount - relationshipExemption - basicExemption - individualFinancialExemption - spouseTransferredExemption - individualLumpSumExemption
     );
 
-    // ✅ 배우자는 과세 표준 0 처리
+   // ✅ 배우자일 경우 미리 계산된 과세표준 적용
     if (heir.relationship === "spouse") {
-        finalTaxableAmount = 0;
+        finalTaxableAmount = spouseFinalTaxableAmount;
     }
 
     // ✅ 개별 상속세 계산
