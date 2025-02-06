@@ -1009,7 +1009,7 @@ console.log(`최종 상속세 합계: ${totalInheritanceTax.toLocaleString()} �
 // ✅ 최종 결과 출력 (객체 배열을 활용한 동적 HTML 생성)
 document.getElementById('result').innerHTML = `
     <h3>총 상속 금액: ${totalAssetValue.toLocaleString()} 원</h3>
-    ${inheritanceCosts > 0 ? `<h3>상속 경비 총합: ${inheritanceCosts.toLocaleString()} 원</h3>` : ""}  <!-- ✅ 상속 경비 추가 -->
+    ${inheritanceCosts && inheritanceCosts > 0 ? `<h3>상속 비용 총합: ${inheritanceCosts.toLocaleString()} 원</h3>` : ""}
     ${maxFinancialExemption > 0 ? `<h3>금융재산 공제: ${maxFinancialExemption.toLocaleString()} 원</h3>` : ""}
     <h3>기초 공제: ${totalBasicExemption.toLocaleString()} 원</h3>
     ${spouse ? `<h3>배우자 관계공제: 500,000,000 원</h3>` : ""}
