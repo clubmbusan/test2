@@ -697,6 +697,18 @@ function calculateGroupMode() {
     let totalFinancialAssets = 0; // ✅ 금융 재산 총액
     let totalInheritanceTax = 0; // ✅ 최종 상속세 합계
 
+    // ✅ 상속 경비 입력값 가져오기 (💡 금융 재산 총액 계산 바로 위에 배치)
+    let funeralExpense = parseInt(document.getElementById("inheritanceFuneralCost")?.value.replace(/,/g, "")) || 0;
+    let legalFees = parseInt(document.getElementById("inheritanceLegalFees")?.value.replace(/,/g, "")) || 0;
+    let unpaidTaxes = parseInt(document.getElementById("inheritanceUnpaidTaxes")?.value.replace(/,/g, "")) || 0;
+    let inheritanceDebt = parseInt(document.getElementById("inheritanceDebt")?.value.replace(/,/g, "")) || 0;
+
+    // ✅ 총 상속 경비 계산
+    let totalInheritanceCosts = funeralExpense + legalFees + unpaidTaxes + inheritanceDebt;
+
+    // ✅ 디버깅 로그 (정상적으로 값이 가져와지는지 확인)
+    console.log("🔍 상속 경비 합계:", totalInheritanceCosts);
+
     // ✅ 금융 재산 총액 계산 (현금 + 주식만 포함)
     document.querySelectorAll('.asset-entry').forEach(asset => {
         let assetType = asset.querySelector('.assetType')?.value;
@@ -993,11 +1005,12 @@ console.log(`최종 상속세 합계: ${totalInheritanceTax.toLocaleString()} �
 // ✅ 최종 결과 출력 (객체 배열을 활용한 동적 HTML 생성)
 document.getElementById('result').innerHTML = `
     <h3>총 상속 금액: ${totalAssetValue.toLocaleString()} 원</h3>
+    ${totalInheritanceCosts > 0 ? `<h3>상속 경비 총합: ${totalInheritanceCosts.toLocaleString()} 원</h3>` : ""}  <!-- ✅ 상속 경비 추가 -->
     ${maxFinancialExemption > 0 ? `<h3>금융재산 공제: ${maxFinancialExemption.toLocaleString()} 원</h3>` : ""}
     <h3>기초 공제: ${totalBasicExemption.toLocaleString()} 원</h3>
     ${spouse ? `<h3>배우자 관계공제: 500,000,000 원</h3>` : ""}
     <h3>일괄 공제: ${lumpSumExemption.toLocaleString()} 원</h3>
-    <h3>장례비: ${funeralExpense.toLocaleString()} 원</h3> 
+   
   
     ${processedHeirs.map((heir) => `
         <h4>${heir.name} (${heir.sharePercentage.toFixed(2)}% 지분)</h4>
