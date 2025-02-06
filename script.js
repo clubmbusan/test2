@@ -697,17 +697,18 @@ function calculateGroupMode() {
     let totalFinancialAssets = 0; // ✅ 금융 재산 총액
     let totalInheritanceTax = 0; // ✅ 최종 상속세 합계
 
-    // ✅ 상속 경비 입력값 가져오기 (💡 금융 재산 총액 계산 바로 위에 배치)
-    let funeralExpense = parseInt(document.getElementById("inheritanceFuneralCost")?.value.replace(/,/g, "")) || 0;
-    let legalFees = parseInt(document.getElementById("inheritanceLegalFees")?.value.replace(/,/g, "")) || 0;
-    let unpaidTaxes = parseInt(document.getElementById("inheritanceUnpaidTaxes")?.value.replace(/,/g, "")) || 0;
-    let inheritanceDebt = parseInt(document.getElementById("inheritanceDebt")?.value.replace(/,/g, "")) || 0;
+    // ✅ 상속 경비 입력값 가져오기 (💡 모달에서 입력된 값 사용)
+    let funeralExpense = parseInt(document.getElementById("funeralCost")?.value.replace(/,/g, "")) || 0;
+    let legalFees = parseInt(document.getElementById("legalFees")?.value.replace(/,/g, "")) || 0;
+    let unpaidTaxes = parseInt(document.getElementById("unpaidTaxes")?.value.replace(/,/g, "")) || 0;
+    let inheritanceDebt = parseInt(document.getElementById("debt")?.value.replace(/,/g, "")) || 0;
 
     // ✅ 총 상속 경비 계산
     let totalInheritanceCosts = funeralExpense + legalFees + unpaidTaxes + inheritanceDebt;
 
     // ✅ 디버깅 로그 (정상적으로 값이 가져와지는지 확인)
     console.log("🔍 상속 경비 합계:", totalInheritanceCosts);
+    
 
     // ✅ 금융 재산 총액 계산 (현금 + 주식만 포함)
     document.querySelectorAll('.asset-entry').forEach(asset => {
