@@ -947,8 +947,8 @@ let processedHeirs = heirs?.map((heir) => {
     let basicExemption = heir.basicExemption ?? (totalBasicExemption * heir.sharePercentage) / 100;
     let spouseTransferredExemption = heir.spouseTransferredExemption || 0;
 
-    // ✅ 기존 값을 유지하여 초과 배분 방지
-    let individualLumpSumExemption = heir.lumpSumExemption;
+    // ✅ 배우자의 경우, lumpSumExemption을 0으로 강제 설정
+    let individualLumpSumExemption = (heir.relationship === "spouse") ? 0 : heir.lumpSumExemption;
 
     // ✅ 금융 재산 공제 (undefined 방지)
     let individualFinancialExemption = heir.sharePercentage 
