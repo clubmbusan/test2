@@ -862,7 +862,18 @@ heirs = heirs.map(heir => {
     };
 });
 
-// ✅ 5. 최종 일괄 공제 총합이 5억을 정확히 맞추는지 확인 (오차 조정)
+ // ✅ 5. 배우자의 lumpSumExemption을 명시적으로 0으로 설정
+heirs = heirs.map(heir => {
+    if (heir.relationship === "spouse") {
+        return { 
+            ...heir, 
+            lumpSumExemption: 0  // 🔥 배우자에게는 일괄 공제 보정액이 절대 배분되지 않도록 설정
+        };
+    }
+    return heir;
+});
+    
+// ✅ 6. 최종 일괄 공제 총합이 5억을 정확히 맞추는지 확인 (오차 조정)
 let finalLumpSumExemptionTotal = heirs
     .reduce((sum, heir) => 
         heir.relationship !== "spouse" ? sum + (heir.lumpSumExemption || 0) : sum, 0
@@ -870,7 +881,7 @@ let finalLumpSumExemptionTotal = heirs
 
 let lumpSumAdjustment = 500000000 - finalLumpSumExemptionTotal;
 
-// ✅ 6. 일괄 공제 조정 (오차가 있으면 배우자 제외 상속인 중 가장 큰 공제 값을 가진 사람에게 적용)
+// ✅ 7. 일괄 공제 조정 (오차가 있으면 배우자 제외 상속인 중 가장 큰 공제 값을 가진 사람에게 적용)
 if (lumpSumAdjustment !== 0) {
     let maxHeirIndex = heirs
         .filter(h => h.relationship !== "spouse")  // 배우자 제외
@@ -882,7 +893,7 @@ if (lumpSumAdjustment !== 0) {
     }
 }
 
-// ✅ 7. 최종 조정 후 로그 확인
+// ✅ 8. 최종 조정 후 로그 확인
 finalLumpSumExemptionTotal = heirs
     .reduce((sum, heir) => 
         heir.relationship !== "spouse" ? sum + (heir.lumpSumExemption || 0) : sum, 0
