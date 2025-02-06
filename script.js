@@ -712,7 +712,15 @@ function calculateGroupMode() {
     // ✅ 디버깅 로그 (정상적으로 값이 가져와지는지 확인)
     console.log("🔍 상속 경비 합계:", totalInheritanceCosts);
     
+  }
 
+    // ✅ 저장 버튼 클릭 시 비용 계산 실행
+    document.getElementById("saveCost")?.addEventListener("click", function() {
+        let totalCosts = calculateInheritanceCosts();
+        console.log("✅ 저장된 상속 경비 합계:", totalCosts);
+     });
+ });
+        
     // ✅ 금융 재산 총액 계산 (현금 + 주식만 포함)
     document.querySelectorAll('.asset-entry').forEach(asset => {
         let assetType = asset.querySelector('.assetType')?.value;
