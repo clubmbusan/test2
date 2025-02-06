@@ -795,12 +795,12 @@ function calculateGroupMode() {
 // ✅ 0. 배우자 제외한 상속인의 개수 확인
 let nonSpouseHeirs = heirs.filter(h => h.relationship !== "spouse").length;
 
-// ✅ 2.배우자 제외한 상속인의 총 지분 계산
+// ✅ 1.배우자 제외한 상속인의 총 지분 계산
 let totalNonSpouseShare = heirs.reduce((sum, heir) => {
     return heir.relationship !== "spouse" ? sum + heir.sharePercentage : sum;
 }, 0);
 
-// ✅ 3. 배우자 제외한 상속인의 지분에 맞게 기초 공제 2억 배분
+// ✅ 2. 배우자 제외한 상속인의 지분에 맞게 기초 공제 2억 배분
 heirs = heirs.map(heir => {
     return {
         ...heir,
@@ -810,19 +810,22 @@ heirs = heirs.map(heir => {
     };
 });
     
-// ✅ 4. 배우자 제외한 상속인의 기초 공제 + 관계 공제 합을 먼저 계산
+// ✅ 1. 배우자 제외한 상속인의 기초 공제 + 관계 공제 합을 먼저 계산
 let totalNonSpouseBasicAndRelationshipExemptions = heirs.reduce((sum, heir) => {
     return heir.relationship !== "spouse"
         ? sum + (heir.basicExemption || 0) + (heir.relationshipExemption || 0)
         : sum;
 }, 0);
 
-// ✅ 5. 배우자 제외한 상속인의 총 상속 지분 계산
+// ✅ 2. 배우자 제외한 상속인의 총 상속 지분 계산
 totalNonSpouseShare = heirs.reduce((sum, heir) => {
     return heir.relationship !== "spouse" ? sum + heir.sharePercentage : sum;
 }, 0);
 
-// ✅ 6. 배우자 제외 상속인의 비율에 따라 남은 일괄 공제 보정액 배분
+// ✅ 3. 부족한 일괄 공제 보정액 계산 (5억 - 기초 공제 + 관계 공제 합)
+let remainingLumpSumExemption = Math.max(500000000 - totalNonSpouseBasicAndRelationshipExemptions, 0);
+
+// ✅ 4. 배우자 제외 상속인의 비율에 따라 남은 일괄 공제 보정액 배분
 heirs = heirs.map(heir => {
     let individualLumpSumExemption = 0;
 
@@ -836,7 +839,7 @@ heirs = heirs.map(heir => {
     };
 });
 
-// ✅ 7. 최종 일괄 공제 총합이 5억을 정확히 맞추는지 확인
+// ✅ 5. 최종 일괄 공제 총합이 5억을 정확히 맞추는지 확인
 let finalLumpSumExemptionTotal = heirs.reduce((sum, heir) => sum + (heir.lumpSumExemption || 0), 0);
 console.log(`🧐 디버깅 - 최종 일괄 공제 보정액 합계:`, finalLumpSumExemptionTotal);
 
