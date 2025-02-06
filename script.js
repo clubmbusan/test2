@@ -698,6 +698,9 @@ function calculateGroupMode() {
     let totalInheritanceTax = 0; // ✅ 최종 상속세 합계
 
     // ✅ 상속 경비 입력값 가져오기 (💡 모달에서 입력된 값 사용)
+    document.addEventListener("DOMContentLoaded", function() {
+    console.log("🔍 문서 로드 완료!");
+       
     let funeralExpense = parseInt(document.getElementById("funeralCost")?.value.replace(/,/g, "")) || 0;
     let legalFees = parseInt(document.getElementById("legalFees")?.value.replace(/,/g, "")) || 0;
     let unpaidTaxes = parseInt(document.getElementById("unpaidTaxes")?.value.replace(/,/g, "")) || 0;
