@@ -1004,7 +1004,6 @@ individualResults.push(`
     <p>개별 상속세: ${individualTax.toLocaleString()} 원</p>
     <hr>
   `);
-});
     
 // ✅ 기초공제(2억) + 관계공제 합이 5억 미만이면 "일괄공제"만 표시
 // ✅ 5억 이상이면 "기초공제(2억) + 관계공제 합"을 표시 (일괄공제 제거)
