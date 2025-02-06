@@ -997,12 +997,13 @@ document.getElementById('result').innerHTML = `
     <h3>기초 공제: ${totalBasicExemption.toLocaleString()} 원</h3>
     ${spouse ? `<h3>배우자 관계공제: 500,000,000 원</h3>` : ""}
     <h3>일괄 공제: ${lumpSumExemption.toLocaleString()} 원</h3>
-
+    <h3>장례비: ${funeralExpense.toLocaleString()} 원</h3> 
+  
     ${processedHeirs.map((heir) => `
         <h4>${heir.name} (${heir.sharePercentage.toFixed(2)}% 지분)</h4>
         <p>상속 금액: ${Math.round(heir.shareAmount).toLocaleString()} 원</p>
         ${heir.financialExemption > 0 ? `<p>금융재산 공제: ${Math.round(heir.financialExemption).toLocaleString()} 원</p>` : ""}
-        <p>기초 공제: ${Math.round(heir.basicExemption).toLocaleString()} 원</p>
+        ${heir.relationship !== "spouse" ? `<p>기초 공제: ${Math.round(heir.basicExemption).toLocaleString()} 원</p>` : ""} <!-- ✅ 배우자 기초공제 제거 -->
         <p>관계 공제: ${Math.round(heir.relationshipExemption).toLocaleString()} 원</p>
         ${(heir.spouseTransferredExemption > 0) ? `<p>배우자 공제 이월: ${Math.round(heir.spouseTransferredExemption).toLocaleString()} 원</p>` : ""}
         ${(heir.relationship === "spouse" && spouseExemptions.additionalExemption > 0) ? `<p>배우자 추가 공제: ${Math.round(spouseExemptions.additionalExemption).toLocaleString()} 원</p>` : ""}
