@@ -849,6 +849,7 @@ console.log("🔍 [디버깅] 남은 일괄 공제 보정액:", remainingLumpSum
 heirs = heirs.map(heir => {
     let individualLumpSumExemption = 0;
 
+    // 배우자가 아닌 경우에만 일괄 공제 보정액 배분
     if (heir.relationship !== "spouse" && totalNonSpouseShare > 0) {
         individualLumpSumExemption = Math.round(
             (remainingLumpSumExemption * heir.sharePercentage) / totalNonSpouseShare
