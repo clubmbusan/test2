@@ -911,17 +911,30 @@ let spouseFinalTaxableAmount = spouseInheritanceAmount
 // ✅ 과세표준이 음수가 되지 않도록 최소값 0으로 보정
 spouseFinalTaxableAmount = Math.max(spouseFinalTaxableAmount, 0);
     
-// ✅ 개별 상속인 데이터 가공
+// ✅ 개별 상속인 데이터 가공 (lumpSumExemption 수정)
 let processedHeirs = heirs?.map((heir) => {
    console.log(`📌 처리 중: ${heir.name} (${heir.relationship})`);
 
     const shareAmount = (totalAssetValue * heir.sharePercentage) / 100;    
    
-     // 🔥 undefined 방지: 기본 값 설정 / 관계 공제, 기초 공제 초기화
+    // 🔥 undefined 방지: 기본 값 설정 / 관계 공제, 기초 공제 초기화
     let relationshipExemption = heir.relationshipExemption || 0;
     let basicExemption = heir.basicExemption ?? (totalBasicExemption * heir.sharePercentage) / 100;
     let spouseTransferredExemption = heir.spouseTransferredExemption || 0;
-    let individualLumpSumExemption = (heir.relationship !== 'spouse') ? (lumpSumExemption * heir.sharePercentage) / 100 : 0;
+
+    // ✅ 교체할 코드 (기존 값을 유지하여 초과 배분 방지)
+    let individualLumpSumExemption = heir.lumpSumExemption;
+
+    // ✅ 디버깅 로그 추가 (배분된 값 확인)
+    console.log("   ✅ 최종 개별 일괄 공제 보정액 (lumpSumExemption):", individualLumpSumExemption);
+
+    return {
+        ...heir,
+        shareAmount,
+        basicExemption,
+        lumpSumExemption: individualLumpSumExemption  // ✅ 기존 값을 그대로 유지
+    };
+});
 
      // ✅ 금융 재산 공제 (undefined 방지)
     let individualFinancialExemption = heir.sharePercentage 
