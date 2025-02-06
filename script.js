@@ -800,12 +800,12 @@ let validHeirs = heirs.filter(heir =>
     (totalAssetValue * heir.sharePercentage) / 100 > 0
 );
 
-// ✅ b. 배우자 제외한 상속인의 총 지분 계산
+// ✅ b. 배우자 제외한 상속인의 총 지분 계산 (배우자 지분 제외)
 let totalNonSpouseShare = heirs
     .filter(h => h.relationship !== "spouse")
     .reduce((sum, heir) => sum + heir.sharePercentage, 0);
 
-// ✅ c. 배우자 제외한 상속인의 지분에 맞게 기초 공제 2억 배분
+// ✅ c. 배우자 제외한 상속인의 지분에 맞게 기초 공제 배분 (2억 한도 내)
 heirs = heirs.map(heir => ({
     ...heir,
     basicExemption: (heir.relationship !== "spouse" && totalNonSpouseShare > 0)
@@ -818,20 +818,19 @@ let totalNonSpouseInheritanceAmount = heirs
     .filter(h => h.relationship !== "spouse")
     .reduce((sum, heir) => sum + ((totalAssetValue * heir.sharePercentage) / 100), 0);
 
-// ✅ 2. 배우자 제외한 상속인의 기초 공제 + 관계 공제 합 계산
+// ✅ 2. 배우자 제외한 상속인의 기초 공제 + 관계 공제 총합 계산
 let totalNonSpouseBasicAndRelationshipExemptions = heirs
     .filter(h => h.relationship !== "spouse")
     .reduce((sum, heir) => sum + (heir.basicExemption || 0) + (heir.relationshipExemption || 0), 0);
 
-// ✅ 3. 부족한 일괄 공제 보정액 계산 (5억 - 기초 공제 + 관계 공제 합)
+// ✅ 3. 남은 일괄 공제 보정액 계산 (5억에서 기초공제 + 관계공제 차감)
 let remainingLumpSumExemption = Math.max(
     500000000 - totalNonSpouseBasicAndRelationshipExemptions, 
     0
 );
 
-console.log("🔍 [디버깅] 남은 일괄 공제 보정액 (기대값: 5억 - 기초/관계 공제):", 
-    remainingLumpSumExemption
-);
+// 🔍 디버깅 로그 (기대값: 5억 - (기초공제 + 관계공제 합))
+console.log("🔍 [디버깅] 남은 일괄 공제 보정액:", remainingLumpSumExemption);
 
 // ✅ 4. 배우자 제외한 상속인의 비율에 따라 남은 일괄 공제 보정액 배분
 heirs = heirs.map(heir => {
@@ -869,15 +868,13 @@ if (lumpSumAdjustment !== 0) {
     }
 }
 
-// ✅ 7. 최종 일괄 공제 총합 로그 확인
+// ✅ 7. 최종 조정 후 로그 확인
 finalLumpSumExemptionTotal = heirs
     .reduce((sum, heir) => 
         heir.relationship !== "spouse" ? sum + (heir.lumpSumExemption || 0) : sum, 0
     );
 
-console.log(`✅ 최종 일괄 공제 보정액 합계 (기대값: 5억):`, 
-    finalLumpSumExemptionTotal
-);
+console.log(`✅ 최종 일괄 공제 보정액 합계 (기대값: 5억):`, finalLumpSumExemptionTotal);
 
 // ✅ 배우자 관련 변수를 먼저 선언하여 어디서든 접근 가능하도록 수정
 let spouseInheritanceAmount = 0;
