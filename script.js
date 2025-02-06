@@ -818,7 +818,7 @@ let totalNonSpouseBasicAndRelationshipExemptions = heirs.reduce((sum, heir) => {
 }, 0);
 
 // ✅ 5. 배우자 제외한 상속인의 총 상속 지분 계산
-let totalNonSpouseShare = heirs.reduce((sum, heir) => {
+totalNonSpouseShare = heirs.reduce((sum, heir) => {
     return heir.relationship !== "spouse" ? sum + heir.sharePercentage : sum;
 }, 0);
 
