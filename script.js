@@ -909,6 +909,7 @@ let spouseInheritanceAmount = 0;
 let spouseFinancialExemption = 0;
 let spouseBasicExemption = 0;
 let spouseRelationshipExemption = 500000000; // 배우자 관계 공제 (5억)
+let spouseAdditionalExemption = 0; // ✅ 배우자 추가 공제 기본값 초기화
 
 // ✅ 배우자가 있을 경우, 실제 상속 금액 계산
 if (spouse) {
@@ -917,13 +918,13 @@ if (spouse) {
     spouseBasicExemption = (totalBasicExemption * spouse.sharePercentage) / 100;
 
     // ✅ 배우자의 추가 공제 수정 (음수 값이 발생하지 않도록 보정)
-    let spouseAdditionalExemption = 0;
     if (spouseInheritanceAmount > spouseRelationshipExemption) {
         spouseAdditionalExemption = Math.min(
             spouseInheritanceAmount - spouseRelationshipExemption, 
             3000000000 // 최대 30억
         );
     }
+
     spouseExemptions.additionalExemption = spouseAdditionalExemption;
 
     let spouseRemainingAmount = spouseInheritanceAmount 
@@ -940,6 +941,7 @@ if (spouse) {
 // ✅ 배우자의 과세 표준 계산 (기초 공제 제외)
 let spouseFinalTaxableAmount = spouseInheritanceAmount  
                                - spouseFinancialExemption 
+                               - spouseBasicExemption   // 🔥 배우자의 기본 공제도 차감
                                - spouseRelationshipExemption 
                                - spouseExemptions.additionalExemption;
 
