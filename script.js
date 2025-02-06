@@ -1004,7 +1004,8 @@ individualResults.push(`
     <p>개별 상속세: ${individualTax.toLocaleString()} 원</p>
     <hr>
   `);
-    
+ });  
+
 // ✅ 기초공제(2억) + 관계공제 합이 5억 미만이면 "일괄공제"만 표시
 // ✅ 5억 이상이면 "기초공제(2억) + 관계공제 합"을 표시 (일괄공제 제거)
 let exemptionDisplay = "";
@@ -1028,7 +1029,10 @@ document.getElementById('result').innerHTML = `
     <h3>최종 상속세 합계: ${totalInheritanceTax.toLocaleString()} 원</h3>  
 `;
 }
-          
+
+ // ✅ 계산 버튼 클릭 시 실행
+  document.getElementById('calculateButton').addEventListener('click', calculateLegalInheritance);
+
 /**                  
  * ✅ 법정 상속 계산 함수 (민법에 따른 법정 상속 비율 자동 적용)
  * @description 법정 상속 방식으로 상속인의 법정 지분을 자동 계산하고, 
