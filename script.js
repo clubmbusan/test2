@@ -696,28 +696,6 @@ function calculateGroupMode() {
     let totalBasicExemption = 200000000; // ✅ 기초 공제 (2억 원)
     let totalFinancialAssets = 0; // ✅ 금융 재산 총액
     let totalInheritanceTax = 0; // ✅ 최종 상속세 합계
-
-    // ✅ 상속 경비 입력값 가져오기 (💡 모달에서 입력된 값 사용)
-    document.addEventListener("DOMContentLoaded", function() {
-    console.log("🔍 문서 로드 완료!");
-       
-    let funeralExpense = parseInt(document.getElementById("funeralCost")?.value.replace(/,/g, "")) || 0;
-    let legalFees = parseInt(document.getElementById("legalFees")?.value.replace(/,/g, "")) || 0;
-    let unpaidTaxes = parseInt(document.getElementById("unpaidTaxes")?.value.replace(/,/g, "")) || 0;
-    let inheritanceDebt = parseInt(document.getElementById("debt")?.value.replace(/,/g, "")) || 0;
-
-    // ✅ 총 상속 경비 계산
-    let totalInheritanceCosts = funeralExpense + legalFees + unpaidTaxes + inheritanceDebt;
-
-    // ✅ 디버깅 로그 (정상적으로 값이 가져와지는지 확인)
-    console.log("🔍 상속 경비 합계:", totalInheritanceCosts);
-    
-    // ✅ 저장 버튼 클릭 시 비용 계산 실행
-    document.getElementById("saveCost")?.addEventListener("click", function() {
-        let totalCosts = calculateInheritanceCosts();
-        console.log("✅ 저장된 상속 경비 합계:", totalCosts);
-     });
- });
         
     // ✅ 금융 재산 총액 계산 (현금 + 주식만 포함)
     document.querySelectorAll('.asset-entry').forEach(asset => {
