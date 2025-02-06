@@ -804,14 +804,12 @@ let totalNonSpouseShare = validHeirs.reduce((sum, heir) =>
 );
 
 // ✅ b. 배우자 제외한 상속인의 지분에 맞게 기초 공제 2억 배분
-heirs = heirs.map(heir => {
-    return {
-        ...heir,
-        basicExemption: heir.relationship !== "spouse" && totalNonSpouseShare > 0
-            ? (totalBasicExemption * heir.sharePercentage) / totalNonSpouseShare
-            : 0
-    };
-});
+heirs = heirs.map(heir => ({
+    ...heir,
+    basicExemption: (heir.relationship !== "spouse" && totalNonSpouseShare > 0)
+        ? Math.round((totalBasicExemption * heir.sharePercentage) / totalNonSpouseShare)
+        : 0
+}));
 
 // ✅ 1. 배우자 제외한 상속인의 실제 상속 금액 계산 (상속 금액이 0원이면 보정액 배분 X)
 let totalNonSpouseInheritanceAmount = validHeirs.reduce((sum, heir) => 
