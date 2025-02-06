@@ -832,18 +832,14 @@ let remainingLumpSumExemption = Math.max(
 // 🔍 디버깅 로그 (기대값: 5억 - (기초공제 + 관계공제 합))
 console.log("🔍 [디버깅] 남은 일괄 공제 보정액:", remainingLumpSumExemption);
 
-// ✅ 4. 배우자 제외한 상속인의 비율에 따라 남은 일괄 공제 보정액 배분 (무조건 2억 3천 이하)
+// ✅ 4. 배우자 제외한 상속인의 비율에 따라 남은 일괄 공제 보정액 배분
 heirs = heirs.map(heir => {
     let individualLumpSumExemption = 0;
 
     if (heir.relationship !== "spouse" && totalNonSpouseShare > 0) {
-        // 💡 ✅ 2억 3천 이상 배분되지 않도록 강제 제한
-        let calculatedExemption = Math.round(
+        individualLumpSumExemption = Math.round(
             (remainingLumpSumExemption * heir.sharePercentage) / totalNonSpouseShare
         );
-
-        // ✅ 계산된 값이 remainingLumpSumExemption을 초과하지 않도록 보장
-        individualLumpSumExemption = Math.min(calculatedExemption, remainingLumpSumExemption);
     }
 
     return {
