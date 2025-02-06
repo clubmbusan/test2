@@ -795,12 +795,12 @@ function calculateGroupMode() {
 // ✅ 0. 배우자 제외한 상속인의 개수 확인
 let nonSpouseHeirs = heirs.filter(h => h.relationship !== "spouse").length;
 
-// ✅ 1.배우자 제외한 상속인의 총 지분 계산
+// ✅ a.배우자 제외한 상속인의 총 지분 계산
 let totalNonSpouseShare = heirs.reduce((sum, heir) => {
     return heir.relationship !== "spouse" ? sum + heir.sharePercentage : sum;
 }, 0);
 
-// ✅ 2. 배우자 제외한 상속인의 지분에 맞게 기초 공제 2억 배분
+// ✅ b. 배우자 제외한 상속인의 지분에 맞게 기초 공제 2억 배분
 heirs = heirs.map(heir => {
     return {
         ...heir,
@@ -809,23 +809,30 @@ heirs = heirs.map(heir => {
             : 0
     };
 });
-    
-// ✅ 1. 배우자 제외한 상속인의 기초 공제 + 관계 공제 합을 먼저 계산
+
+ // ✅ 1. 배우자 제외한 상속인의 기초 공제 + 관계 공제 합을 먼저 계산
 let totalNonSpouseBasicAndRelationshipExemptions = heirs.reduce((sum, heir) => {
     return heir.relationship !== "spouse"
         ? sum + (heir.basicExemption || 0) + (heir.relationshipExemption || 0)
         : sum;
 }, 0);
-
-// ✅ 2. 배우자 제외한 상속인의 총 상속 지분 계산 (변수 선언 추가)
-totalNonSpouseShare = heirs.reduce((sum, heir) => {
+    
+// ✅ 2. 배우자 제외한 상속인의 총 지분 계산
+let totalNonSpouseShare = heirs.reduce((sum, heir) => {
     return heir.relationship !== "spouse" ? sum + heir.sharePercentage : sum;
 }, 0);
 
 // ✅ 3. 부족한 일괄 공제 보정액 계산 (5억 - 기초 공제 + 관계 공제 합)
 let remainingLumpSumExemption = Math.max(500000000 - totalNonSpouseBasicAndRelationshipExemptions, 0);
+   
+// ✅ 4. 배우자 제외한 상속인의 실제 상속 금액 계산
+let totalNonSpouseInheritanceAmount = heirs.reduce((sum, heir) => {
+    return heir.relationship !== "spouse"
+        ? sum + ((totalAssetValue * heir.sharePercentage) / 100)
+        : sum;
+}, 0);
 
-// ✅ 4. 배우자 제외한 상속인의 비율에 따라 남은 일괄 공제 보정액 배분
+// ✅ 5. 배우자 제외한 상속인의 비율에 따라 남은 일괄 공제 보정액 배분
 heirs = heirs.map(heir => {
     let individualLumpSumExemption = 0;
 
@@ -839,22 +846,23 @@ heirs = heirs.map(heir => {
     };
 });
 
-// ✅ 5. 최종 일괄 공제 총합이 5억을 정확히 맞추는지 확인 (오차 조정)
+// ✅ 6. 최종 일괄 공제 총합이 5억을 정확히 맞추는지 확인 (오차 조정)
 let finalLumpSumExemptionTotal = heirs.reduce((sum, heir) => sum + (heir.lumpSumExemption || 0), 0);
 let lumpSumAdjustment = 500000000 - finalLumpSumExemptionTotal;
 
-// ✅ 6. 일괄 공제 조정 (오차가 있으면 가장 큰 금액을 가진 상속인에게 보정)
+// ✅ 7. 일괄 공제 조정 (오차가 있으면 가장 큰 금액을 가진 상속인에게 보정)
 if (lumpSumAdjustment !== 0) {
     let maxHeirIndex = heirs
-        .filter(h => h.relationship !== "spouse")
-        .reduce((maxIndex, heir, index, arr) => 
-            heir.lumpSumExemption > arr[maxIndex].lumpSumExemption ? index : maxIndex, 0
-        );
+        .map((heir, index) => ({ index, lumpSumExemption: heir.lumpSumExemption }))  // 인덱스 포함하여 정렬
+        .filter(h => h.lumpSumExemption > 0)  // 공제 값이 있는 상속인만 고려
+        .sort((a, b) => b.lumpSumExemption - a.lumpSumExemption)[0]?.index;  // 가장 큰 공제 값을 가진 상속인 선택
 
-    heirs[maxHeirIndex].lumpSumExemption += lumpSumAdjustment;
+    if (maxHeirIndex !== undefined) {
+        heirs[maxHeirIndex].lumpSumExemption += lumpSumAdjustment;
+    }
 }
 
-// ✅ 7. 최종 일괄 공제 총합 로그 확인
+// ✅ 8. 최종 일괄 공제 총합 로그 확인
 finalLumpSumExemptionTotal = heirs.reduce((sum, heir) => sum + (heir.lumpSumExemption || 0), 0);
 console.log(`✅ 최종 일괄 공제 보정액 합계:`, finalLumpSumExemptionTotal);
 
