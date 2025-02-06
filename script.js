@@ -830,7 +830,7 @@ let remainingLumpSumExemption = totalNonSpouseInheritanceAmount > 0
     : 0;
 
 // ✅ 4. 배우자 제외한 상속인의 총 지분 계산 (배우자 포함 X)
-let totalNonSpouseShare = heirs.reduce((sum, heir) => {
+totalNonSpouseShare = heirs.reduce((sum, heir) => {
     return heir.relationship !== "spouse" ? sum + heir.sharePercentage : sum;
 }, 0);
 
