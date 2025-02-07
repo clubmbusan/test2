@@ -1031,17 +1031,7 @@ let processedHeirs = heirs?.map((heir) => {
         finalTaxableAmount,
         individualTax: finalTaxableAmount > 0 ? calculateInheritanceTax(finalTaxableAmount) : 0
     };
-}) || [];
-    
-// ✅ 총 일괄 공제 계산 (기초공제 + 관계공제 + 개별 일괄 공제 보정액의 합이 5억을 넘으면 5억으로 제한)
-lumpSumExemption = Math.min(processedHeirs.reduce((sum, heir) => {
-    return sum + heir.basicExemption + heir.relationshipExemption + heir.lumpSumExemption;
-}, 0), 500000000);
-
-// ❗️ NaN 방지
-if (isNaN(lumpSumExemption) || lumpSumExemption < 0) {
-    lumpSumExemption = 0;
-}
+}) || []; 
 
 // ✅ 최종 상속세 합계 계산 (개별 상속세 총합)
 let totalInheritanceTax = processedHeirs.reduce((sum, heir) => sum + heir.individualTax, 0);
