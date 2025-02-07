@@ -1034,7 +1034,7 @@ let processedHeirs = heirs?.map((heir) => {
 }) || []; 
 
 // ✅ 최종 상속세 합계 계산 (개별 상속세 총합)
-let totalInheritanceTax = processedHeirs.reduce((sum, heir) => sum + heir.individualTax, 0);
+totalInheritanceTax = processedHeirs.reduce((sum, heir) => sum + heir.individualTax, 0);
 
 // ✅ 최종 상속세에서 상속 비용이 이미 반영되었는지 확인 후 조정
 let finalTotalTax = Math.max(0, totalInheritanceTax);   
