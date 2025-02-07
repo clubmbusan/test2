@@ -553,15 +553,11 @@ function calculateInheritanceCosts() {
     console.log("🔍 비용 차감 후 상속 금액:", taxableAssetValue);
 }
 
-// ✅ 2. 저장 버튼 클릭 시 비용 계산 실행  
-document.addEventListener("DOMContentLoaded", function () {
-    const saveCostButton = document.getElementById("saveCost");
-    if (saveCostButton) {
-        saveCostButton.addEventListener("click", function () {
-            calculateInheritanceCosts();
-            console.log("✅ 저장된 상속 비용 합계:", inheritanceCosts);
-        });
-    }
+// ✅ 2. 저장 버튼 클릭 시 비용 계산 실행 후, 상속세 재계산  
+document.getElementById("saveCost")?.addEventListener("click", function () {
+    calculateInheritanceCosts();
+    calculateGroupMode();  // ✅ 저장 후 상속세 재계산
+    console.log("✅ 저장된 상속 비용 합계:", inheritanceCosts);
 });
 
 // ✅ 3. 비용 차감 후 상속 금액 반환 함수   
@@ -1583,38 +1579,29 @@ function calculateBusinessPersonalMode(totalAssetValue) {
         overlay.style.display = "none";
     });
 
-    // ✅ "저장" 버튼 클릭 시 입력된 비용을 합산하여 totalDeductibleCost에 저장
-    saveCostButton.addEventListener("click", function () {
-        let funeralCost = parseFloat(document.getElementById("funeralCost").value.replace(/,/g, '')) || 0;
-        let legalFees = parseFloat(document.getElementById("legalFees").value.replace(/,/g, '')) || 0;
-        let unpaidTaxes = parseFloat(document.getElementById("unpaidTaxes").value.replace(/,/g, '')) || 0;
-        let debt = parseFloat(document.getElementById("debt").value.replace(/,/g, '')) || 0;
+// ✅ "저장" 버튼 클릭 시 비용을 공통 함수로 계산하고, 상속세 재계산
+saveCostButton.addEventListener("click", function () {
+    calculateInheritanceCosts(); // ✅ 공통 비용 계산 함수 호출
+    calculateGroupMode(); // ✅ 저장 후 상속세 재계산
 
-        // ✅ 총 공제 금액 계산
-        let totalDeductibleCost = funeralCost + legalFees + unpaidTaxes + debt;
+    console.log("✅ 저장된 상속 비용 합계:", inheritanceCosts);
 
-        // ✅ 디버깅 로그 출력
-        console.log("총 공제 금액:", totalDeductibleCost);
+    // ✅ 공제 금액을 alert으로 출력하여 확인
+    alert(`총 공제 금액: ${inheritanceCosts.toLocaleString()} 원`);
 
-        // ✅ 공제 금액을 alert으로 출력하여 확인
-        alert(`총 공제 금액: ${totalDeductibleCost.toLocaleString()} 원`);
+    // ✅ 모달 닫기
+    modal.style.display = "none";
+    overlay.style.display = "none";
+});
 
-        // ✅ 공제 금액을 window 객체에 저장하여 calculateButton에서 참조 가능하도록 설정
-        window.totalDeductibleCost = totalDeductibleCost;
+// ✅ 오버레이 클릭 시 모달 닫기
+overlay.addEventListener("click", function () {
+    console.log("✅ '오버레이' 클릭됨! 모달창 닫기");
+    modal.style.display = "none";
+    overlay.style.display = "none";
+});
 
-        // ✅ 모달 닫기
-        modal.style.display = "none";
-        overlay.style.display = "none";
-    });
-
-    // ✅ 오버레이 클릭 시 모달 닫기
-    overlay.addEventListener("click", function () {
-        console.log("✅ '오버레이' 클릭됨! 모달창 닫기");
-        modal.style.display = "none";
-        overlay.style.display = "none";
-    });
-
-    console.log("✅ 강제 실행 완료");
+console.log("✅ 강제 실행 완료");
 })();
 
 // ✅ 계산 버튼 클릭 시 총 상속 금액에서 상속 비용을 공제하도록 수정
