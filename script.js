@@ -1614,7 +1614,6 @@ document.getElementById('calculateButton').addEventListener('click', () => {
 
     console.log("📌 최종 상속 금액 (공제 적용 후):", totalAssetValue);
     console.log("📌 현재 선택된 상속 유형:", document.getElementById('inheritanceType').value); // 디버깅 추가
-});
 
     // ✅ 상속 유형에 따라 계산 실행
     switch (document.getElementById('inheritanceType').value) {
