@@ -1012,9 +1012,9 @@ let processedHeirs = heirs?.map((heir) => {
 
     // ✅ 배우자일 경우 미리 계산된 과세표준 적용
     if (heir.relationship === "spouse") {
-        finalTaxableAmount = spouseFinalTaxableAmount;
+        finalTaxableAmount = spouseFinalTaxableAmount;        
     }
-
+   
     console.log("   ✅ 처리 후 - 개별 금융재산 공제 (financialExemption):", individualFinancialExemption);
     console.log("   ✅ 처리 후 - 배우자 공제 이월 (spouseTransferredExemption):", spouseTransferredExemption);
     console.log("   ✅ 처리 후 - 개별 일괄 공제 보정액 (lumpSumExemption):", individualLumpSumExemption);
@@ -1032,7 +1032,7 @@ let processedHeirs = heirs?.map((heir) => {
         individualTax: finalTaxableAmount > 0 ? calculateInheritanceTax(finalTaxableAmount) : 0
     };
 }) || [];
-
+    
 // ✅ 총 일괄 공제 계산 (기초공제 + 관계공제 + 개별 일괄 공제 보정액의 합이 5억을 넘으면 5억으로 제한)
 lumpSumExemption = Math.min(processedHeirs.reduce((sum, heir) => {
     return sum + heir.basicExemption + heir.relationshipExemption + heir.lumpSumExemption;
@@ -1043,13 +1043,19 @@ if (isNaN(lumpSumExemption) || lumpSumExemption < 0) {
     lumpSumExemption = 0;
 }
 
+// ✅ 최종 상속세 합계 계산 (개별 상속세 총합)
+let totalInheritanceTax = processedHeirs.reduce((sum, heir) => sum + heir.individualTax, 0);
+
+// ✅ 최종 상속세에서 상속 비용이 이미 반영되었는지 확인 후 조정
+let finalTotalTax = Math.max(0, totalInheritanceTax);   
+
 // ✅ 최종 결과 출력 (디버깅용)
 console.log(`최종 상속세 합계: ${totalInheritanceTax.toLocaleString()} 원`);
 
 // ✅ 최종 결과 출력 (객체 배열을 활용한 동적 HTML 생성)
 document.getElementById('result').innerHTML = `
     <h3>총 상속 금액: ${totalAssetValue.toLocaleString()} 원</h3>
-    ${inheritanceCosts && inheritanceCosts > 0 ? `<h3>상속 비용 총합: ${inheritanceCosts.toLocaleString()} 원</h3>` : ""}
+    ${inheritanceCosts > 0 ? `<h3>상속 비용 총합: ${inheritanceCosts.toLocaleString()} 원</h3>` : ""}
     ${inheritanceCosts > 0 ? `<h3>비용 차감 후 상속 금액: ${taxableAssetValue.toLocaleString()} 원</h3>` : ""}
     ${maxFinancialExemption > 0 ? `<h3>금융재산 공제: ${maxFinancialExemption.toLocaleString()} 원</h3>` : ""}
     <h3>기초 공제: ${totalBasicExemption.toLocaleString()} 원</h3>
