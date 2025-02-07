@@ -526,12 +526,18 @@ function calculateTaxableAmount(totalInheritance, exemptions) {
 }
 
 /**  
- * ✅ 상속 비용 변수 선언 (공용 전역 변수로 설정)
+ * ✅ 상속 비용 변수 및 계산 함수 (공통 처리)  
+ * - 모든 상속 유형에서 공통으로 사용할 비용 계산 기능
  */
-let inheritanceCosts = 0;
 
-// ✅ 상속 비용 계산 함수 (모달에서 입력된 값 사용)
+// ✅ 전역 변수 선언 (모든 상속 유형에서 공유)
+let inheritanceCosts = 0;         // 상속 비용 총합
+let taxableAssetValue = 0;        // 비용 차감 후 상속 금액
+ 
+// ✅ 1. 상속 비용 계산 함수  
 function calculateInheritanceCosts() {
+    let totalAssetValue = parseInt(document.getElementById("cashAmount")?.value.replace(/,/g, "")) || 0;
+
     let funeralExpense = parseInt(document.getElementById("funeralCost")?.value.replace(/,/g, "")) || 0;
     let legalFees = parseInt(document.getElementById("legalFees")?.value.replace(/,/g, "")) || 0;
     let unpaidTaxes = parseInt(document.getElementById("unpaidTaxes")?.value.replace(/,/g, "")) || 0;
@@ -540,16 +546,28 @@ function calculateInheritanceCosts() {
     // ✅ 총 상속 비용 계산
     inheritanceCosts = funeralExpense + legalFees + unpaidTaxes + inheritanceDebt;
     
-    console.log("🔍 상속 비용 합계:", inheritanceCosts); // ✅ 디버깅 로그
+    // ✅ 비용 차감 후 상속 금액 계산 (음수 방지)
+    taxableAssetValue = Math.max(0, totalAssetValue - inheritanceCosts);
 
-    return inheritanceCosts;
+    console.log("🔍 상속 비용 합계:", inheritanceCosts);
+    console.log("🔍 비용 차감 후 상속 금액:", taxableAssetValue);
 }
 
-// ✅ 저장 버튼 클릭 시 비용 계산 실행 (모달에서 입력 후 버튼 클릭 시 반영)
-document.getElementById("saveCost")?.addEventListener("click", function() {
-    calculateInheritanceCosts();
-    console.log("✅ 저장된 상속 비용 합계:", inheritanceCosts);
+// ✅ 2. 저장 버튼 클릭 시 비용 계산 실행  
+document.addEventListener("DOMContentLoaded", function () {
+    const saveCostButton = document.getElementById("saveCost");
+    if (saveCostButton) {
+        saveCostButton.addEventListener("click", function () {
+            calculateInheritanceCosts();
+            console.log("✅ 저장된 상속 비용 합계:", inheritanceCosts);
+        });
+    }
 });
+
+// ✅ 3. 비용 차감 후 상속 금액 반환 함수   
+function getTaxableAssetValue() {
+    return taxableAssetValue; // 비용 반영된 상속 금액 반환
+}
     
  /**
  * 상속세 계산 함수 (각 구간별 계산 후 누진공제 적용)
