@@ -253,41 +253,9 @@ initializeDefaultView();
 
         console.log("✅ 내부 변수 초기화 완료!");       
        }
-    });
-    
-// 초기 주식 입력 필드에 콤마 이벤트 등록 (초기 필드)
-const initialStockPriceField = document.querySelector('.stockPriceField');
-if (initialStockPriceField) {
-    addCommaFormatting(initialStockPriceField); // 초기 필드 이벤트 등록
-}
+    });    
 
-   // ✅ 모든 상속 비용 입력 필드에 자동으로 콤마 추가
-document.querySelectorAll('.inheritanceCostField').forEach((input) => {
-    input.addEventListener('input', function (event) {
-        let value = event.target.value.replace(/,/g, ''); // 기존 콤마 제거
-        if (value !== '') { // 빈 값이 아닐 경우에만 변환
-            value = parseFloat(value).toLocaleString(); // 숫자로 변환 후 콤마 추가
-        }
-        event.target.value = value; // 입력 필드에 반영
-    });
-});
-
-     // 재산 추가 버튼 클릭 이벤트
-document.getElementById('addAssetButton').addEventListener('click', () => {
-    createAssetEntry();
-
-    // 새롭게 추가된 .assetValue 필드에 콤마 이벤트 등록
-    const newAssetValues = document.querySelectorAll('.asset-entry:last-child .assetValue');
-    newAssetValues.forEach(addCommaFormatting);
-
-    // 새롭게 추가된 .assetType 필드에 이벤트 등록
-    const newAssetTypeSelect = document.querySelector('.asset-entry:last-child .assetType');
-    if (newAssetTypeSelect) {
-        newAssetTypeSelect.addEventListener('change', () => handleAssetTypeChange(newAssetTypeSelect));
-    }
-});
-
-    // 재산 항목 생성
+// 재산 항목 생성
 function createAssetEntry() {
     const newAsset = document.createElement('div');
     newAsset.className = 'asset-entry';
@@ -296,16 +264,13 @@ function createAssetEntry() {
         <select class="assetType">
             <option value="cash">현금</option>
             <option value="realEstate">부동산</option>
-Use Control + Shift + m to toggle the tab key moving focus. Alternatively, use esc then tab to move to the next interactive element on the page.
-Editing test2-1/script.js at main · clubmbusan/test2-1
-
             <option value="stock">주식</option>
             <option value="others">기타</option>
         </select>
         <div class="assetFields">
             <input type="text" class="cashField assetValue" placeholder="금액 (원)" style="display: block;">
             <input type="text" class="realEstateField assetValue" placeholder="평가액 (원)" style="display: none;">
-            <input type="number" class="stockQuantityField" placeholder="주식 수량" style="display: none;">
+            <input type="text" class="stockQuantityField" placeholder="주식 수량" style="display: none;">
             <input type="text" class="stockPriceField" placeholder="주당 가격 (원)" style="display: none;">
             <input type="text" class="stockTotalField assetValue" placeholder="금액 (원)" style="display: none;" readonly>
             <input type="text" class="othersField assetValue" placeholder="금액 (원)" style="display: none;">
@@ -319,68 +284,7 @@ Editing test2-1/script.js at main · clubmbusan/test2-1
     const assetTypeSelect = newAsset.querySelector('.assetType');
     assetTypeSelect.addEventListener('change', () => handleAssetTypeChange(assetTypeSelect));
 }
-    
- // 숫자에 콤마를 추가하는 함수
-function formatNumberWithCommas(value) {
-    return parseInt(value.replace(/[^0-9]/g, '') || '0', 10).toLocaleString();
-}
-
-// 입력 필드에 콤마 추가 이벤트 등록
-function addCommaFormatting(inputField) {
-    inputField.addEventListener('input', () => {
-        const numericValue = inputField.value.replace(/,/g, ''); // 콤마 제거
-        if (!isNaN(numericValue)) {
-            inputField.value = formatNumberWithCommas(numericValue); // 콤마 추가
-        }
-    });
-} 
-
-// 주식 총 금액 계산
-document.addEventListener('input', () => {
-    const stockQuantity = document.getElementById('stockQuantity');
-    const stockPrice = document.getElementById('stockPrice');
-    const stockTotal = document.getElementById('stockTotal');
-
-    if (stockQuantity && stockPrice && stockTotal) {
-        const quantity = parseInt(stockQuantity.value.replace(/[^0-9]/g, '') || '0', 10);
-        const price = parseInt(stockPrice.value.replace(/[^0-9]/g, '') || '0', 10);
-        stockTotal.value = (quantity * price).toLocaleString(); // 총 금액 계산 및 콤마 추가
-    }
-
-    const mixedStockQuantity = document.getElementById('mixedStockQuantity');
-    const mixedStockPrice = document.getElementById('mixedStockPrice');
-    const mixedTotalAmount = document.getElementById('mixedTotalAmount');
-
-    if (mixedStockQuantity && mixedStockPrice && mixedTotalAmount) {
-        const quantity = parseInt(mixedStockQuantity.value.replace(/[^0-9]/g, '') || '0', 10);
-        const price = parseInt(mixedStockPrice.value.replace(/[^0-9]/g, '') || '0', 10);
-        const total = quantity * price;
-        const cash = parseInt(document.getElementById('mixedCashAmount').value.replace(/[^0-9]/g, '') || '0', 10);
-        const realEstate = parseInt(document.getElementById('mixedRealEstateValue').value.replace(/[^0-9]/g, '') || '0', 10);
-
-        mixedTotalAmount.value = (total + cash + realEstate).toLocaleString(); // 총 금액 계산 및 콤마 추가
-    }
-});
-    
-    // 계산 시 숫자만 추출
-function getNumericValue(field) {
-    return parseFloat(field.value.replace(/[^0-9]/g, '')) || 0; // 숫자로 변환 (기본값 0)
-}
-
-       // 주식 총액을 assetValue에 포함
-document.addEventListener('input', () => {
-    const stockQuantity = document.getElementById('stockQuantity');
-    const stockPrice = document.getElementById('stockPrice');
-    const stockTotal = document.getElementById('stockTotal');
-
-    if (stockQuantity && stockPrice && stockTotal) {
-        const quantity = parseInt(stockQuantity.value.replace(/[^0-9]/g, '') || '0', 10);
-        const price = parseInt(stockPrice.value.replace(/[^0-9]/g, '') || '0', 10);
-        stockTotal.value = (quantity * price).toLocaleString(); // 총 금액 계산
-        stockTotal.classList.add('assetValue'); // assetValue 클래스를 추가하여 총액 계산에 포함
-    }
-});    
-    
+   
 // 상속 비율 입력값 검증 함수
     function validateSharePercentage() {
         const percentageFields = Array.from(document.querySelectorAll('.sharePercentageField'));
@@ -451,6 +355,25 @@ function calculateRelationshipExemption(relationship, age) {
     }
 }
 
+    // 기존 상속 비율 필드 이벤트 등록 (최초 로딩 시 적용)
+document.querySelectorAll('.sharePercentageField').forEach((field) => {
+    field.addEventListener('input', () => {
+        const value = parseFloat(field.value) || 0;
+
+        // 비율 검증: 범위 제한 (0~100)
+        if (value < 0 || value > 100) {
+            alert('상속 비율은 0%에서 100% 사이여야 합니다.');
+            field.value = ''; // 잘못된 입력 초기화
+            return;
+        }
+
+        // 전체 합 검증
+        if (!validateSharePercentage()) {
+            field.value = ''; // 잘못된 입력 초기화
+        }
+    });
+});
+    
     // 새로 추가된 상속 비율 필드 이벤트 등록
     const sharePercentageField = newHeirEntry.querySelector('.sharePercentageField');
     sharePercentageField.addEventListener('input', () => {
@@ -472,26 +395,7 @@ function calculateRelationshipExemption(relationship, age) {
     heirContainer.appendChild(newHeirEntry);
 });
 
-// 기존 상속 비율 필드 이벤트 등록 (최초 로딩 시 적용)
-document.querySelectorAll('.sharePercentageField').forEach((field) => {
-    field.addEventListener('input', () => {
-        const value = parseFloat(field.value) || 0;
-
-        // 비율 검증: 범위 제한 (0~100)
-        if (value < 0 || value > 100) {
-            alert('상속 비율은 0%에서 100% 사이여야 합니다.');
-            field.value = ''; // 잘못된 입력 초기화
-            return;
-        }
-
-        // 전체 합 검증
-        if (!validateSharePercentage()) {
-            field.value = ''; // 잘못된 입력 초기화
-        }
-    });
-});
-
-     // ✅ 법정 상속: 상속인 추가 기능 (협의 상속과 동일)
+    // ✅ 법정 상속: 상속인 추가 기능 (협의 상속과 동일)
     addLegalHeirButton.addEventListener('click', () => {
         const newHeir = document.createElement('div');
         newHeir.classList.add('heir-entry');
@@ -742,12 +646,13 @@ document.getElementById('calculateButton')?.addEventListener('click', function (
 function calculateGroupMode() {
     console.log("✅ 협의 상속 계산 시작");
      
-    // ✅ 상속 비용 (전역 변수에서 가져옴, 값이 없으면 0으로 설정)
-    let inheritanceCosts = window.totalDeductibleCost || 0;
-    console.log(`📌 적용된 상속 비용: ${inheritanceCosts.toLocaleString()} 원`);
- 
-    // ✅ 상속 재산 총액 가져오기
-    const totalAssetValue = parseInt(document.getElementById("cashAmount")?.value.replace(/,/g, "")) || 0;
+    // ✅ 모든 입력된 재산 값을 합산하여 상속 총액 계산
+    let totalAssetValue = Array.from(document.querySelectorAll('.assetValue')).reduce((sum, field) => {
+        const value = parseFloat(field.value.replace(/,/g, '')) || 0;
+        return sum + value;
+    }, 0);
+    console.log(`📌 입력된 총 상속 재산 금액: ${totalAssetValue.toLocaleString()} 원`);
+
     const heirContainer = document.querySelector('#groupSection #heirContainer');
 
     let totalBasicExemption = 200000000; // ✅ 기초 공제 (2억 원)
@@ -763,7 +668,11 @@ function calculateGroupMode() {
         }
     });
 
-    // ✅ 상속 비용 차감 후 최종 상속 재산 계산
+    // ✅ 상속 비용 (전역 변수 window.totalDeductibleCost에서 가져옴)
+    let inheritanceCosts = parseFloat(window.totalDeductibleCost) || 0;
+    console.log(`📌 적용된 상속 비용: ${inheritanceCosts.toLocaleString()} 원`);
+
+    // ✅ 비용 차감 후 최종 상속 재산 계산
     let adjustedAssetValue = Math.max(0, totalAssetValue - inheritanceCosts);
     console.log(`📌 비용 차감 후 최종 상속 재산 금액: ${adjustedAssetValue.toLocaleString()} 원`);
 
@@ -811,7 +720,7 @@ if (spouse) {
     console.log("📌 배우자 상속 금액 (비용 차감 후):", spouseInheritanceAmount.toLocaleString());
 
     // ✅ 1. 금융재산 공제 적용 (최대 2억 원)
-    let spouseFinancialExemption = Math.min((maxFinancialExemption * spouse.sharePercentage) / 100, 200000000);
+    let spouseFinancialExemption = Math.round(Math.min((maxFinancialExemption * spouse.sharePercentage) / 100, 200000000));
     let remainingAfterFinancialExemption = spouseInheritanceAmount - spouseFinancialExemption;
     console.log("📌 금융재산 공제 후 남은 금액:", remainingAfterFinancialExemption.toLocaleString());
 
@@ -824,10 +733,11 @@ if (spouse) {
     let spouseAdditionalExemption = 0;
     let taxableAmount = remainingAfterRelationship;  // 과세 표준 초기화
 
-    if (taxableAmount > 0) {
-        spouseAdditionalExemption = Math.min(taxableAmount, 2500000000);  // 최대 25억 원 공제
-        taxableAmount -= spouseAdditionalExemption;
+    if (remainingAfterRelationship > 0) {
+    spouseAdditionalExemption = Math.min(remainingAfterRelationship, 2500000000);  // 최대 25억 공제
+    remainingAfterRelationship -= spouseAdditionalExemption;
     }
+
     taxableAmount = Math.max(0, taxableAmount);  // 음수 방지
     console.log("📌 배우자 추가 공제 (최대 25억):", spouseAdditionalExemption.toLocaleString());
     console.log("📌 최종 과세 표준:", taxableAmount.toLocaleString());
@@ -968,7 +878,7 @@ console.log(`✅ 최종 일괄 공제 보정액 합계 (기대값: 5억):`, fina
 
 // ✅ 배우자 관련 변수 선언 (중복 제거 및 일관성 유지)
 let spouseInheritanceAmount = (adjustedAssetValue * spouse.sharePercentage) / 100;
-let spouseFinancialExemption = Math.min((maxFinancialExemption * spouse.sharePercentage) / 100, 200000000);
+let spouseFinancialExemption = Math.round(Math.min((maxFinancialExemption * spouse.sharePercentage) / 100, 200000000));
 let spouseRelationshipExemption = Math.min(spouseInheritanceAmount - spouseFinancialExemption, 500000000); 
 let remainingAfterRelationship = spouseInheritanceAmount - spouseFinancialExemption - spouseRelationshipExemption;
 
@@ -1033,9 +943,8 @@ console.log(`📌 비용 차감 후 최종 상속 재산 금액: ${adjustedAsset
         finalTaxableAmount = spouseFinalTaxableAmount;        
     }
 
-    // ✅ 🆕 비용 차감 후 과세 표준 재계산 (비용을 상속 지분에 따라 나누어 차감)
-    let costDeduction = Math.round((inheritanceCosts * heir.sharePercentage) / 100);
-    finalTaxableAmount = Math.max(0, finalTaxableAmount - costDeduction); // 음수 방지
+   // 🔥 상속 비용 공제는 이미 총 상속 금액에서 차감되었으므로, 개별 과세 표준에서는 다시 차감하지 않습니다.
+   finalTaxableAmount = Math.max(0, finalTaxableAmount);  // 그대로 과세 표준 유지
 
     // ✅ 개별 상속세 재계산
     let individualTax = finalTaxableAmount > 0 ? calculateInheritanceTax(finalTaxableAmount) : 0;
@@ -1146,23 +1055,29 @@ function calculateInheritanceTax(taxableAmount) {
 
 // ✅ [법정 상속] 계산 함수
 function calculateLegalInheritance() {
-    // ✅ 입력된 재산 값 가져오기 (쉼표 제거 후 숫자로 변환)
+    console.log("✅ 법정 상속 계산 시작");
+
+    // ✅ 기존 입력된 재산 값 가져오기 (쉼표 제거 후 숫자로 변환)
     let cashValue = parseInt(document.getElementById("cashAmount")?.value.replace(/,/g, "")) || 0;
     let stockValue = parseInt(document.getElementById("stockTotal")?.value.replace(/,/g, "")) || 0;
     let realEstateValue = parseInt(document.getElementById("realEstateValue")?.value.replace(/,/g, "")) || 0;
     let othersValue = parseInt(document.getElementById("othersValue")?.value.replace(/,/g, "")) || 0;
 
     // ✅ 총 상속 재산 계산
-    let totalAssetValue = cashValue + stockValue + realEstateValue + othersValue;
+    let initialTotalAssetValue = cashValue + stockValue + realEstateValue + othersValue;
+    console.log("📌 초기 입력된 총 상속 재산 금액:", initialTotalAssetValue.toLocaleString(), "원");
 
-    // ✅ 비용 차감된 총 상속 금액 계산 (window.totalDeductibleCost 사용)
+    // ✅ 모든 재산의 합산 금액 계산 (추가된 재산 포함)
+    let totalAssetValue = calculateTotalAssetValue();
+    console.log("📌 최종 재산 합산 금액:", totalAssetValue.toLocaleString(), "원");
+
+    // ✅ 상속 비용 차감 후 최종 상속 금액 계산
     let inheritanceCosts = parseFloat(window.totalDeductibleCost) || 0;
-    console.log("📌 최종 상속 비용 (window.totalDeductibleCost):", inheritanceCosts.toLocaleString(), "원");
-
-    // ✅ 비용 차감된 총 상속 금액 계산
     let adjustedAssetValue = Math.max(0, totalAssetValue - inheritanceCosts);
-    console.log("📌 비용 차감 후 최종 상속 금액:", adjustedAssetValue.toLocaleString(), "원");
 
+    console.log("📌 최종 상속 비용 (window.totalDeductibleCost):", inheritanceCosts.toLocaleString(), "원");
+    console.log("📌 비용 차감 후 최종 상속 금액:", adjustedAssetValue.toLocaleString(), "원");
+   
     // ✅ 금융재산 공제 (현금 + 주식 20% 공제, 최대 2억 원)
     let totalFinancialExemption = Math.min((cashValue + stockValue) * 0.2, 200000000);
 
@@ -1485,35 +1400,69 @@ function calculateBusinessPersonalMode(totalAssetValue) {
     `;
 }
 
-  /**
- * 특수 상속 유형별 공제 계산
- * @description 동거주택, 농림재산, 공장 상속에 대한 공제 계산 및 상속세 결과 출력
+/**
+ * ✅ 특수 상속 모든 재산 합산 금액 계산 함수
+ * @returns {number} 모든 입력된 재산의 합계
+ */
+function calculateTotalAssetValue() {
+    console.log("✅ 모든 재산 합산 금액 계산 시작");
+
+    let totalAssetValue = Array.from(document.querySelectorAll('.assetValue')).reduce((sum, field) => {
+        const value = parseFloat(field.value.replace(/,/g, "")) || 0;
+        return sum + value;
+    }, 0);
+
+    console.log("📌 계산된 총 재산 금액:", totalAssetValue.toLocaleString(), "원");
+    return totalAssetValue;
+}
+
+/**
+ * ✅ 특수 상속 계산 함수 (금융재산 공제 포함)
  */
 function calculateSpecialInheritance() {
     console.log("✅ 특수상속 계산 시작");
 
-    // ✅ 상속 재산 입력 필드 확인
-    let inheritanceInput = document.getElementById("realEstateValue");
-    if (!inheritanceInput) {
-        alert("상속 재산 입력 필드를 찾을 수 없습니다.");
-        return;
-    }
+    // ✅ 모든 재산의 합산 금액 계산
+    let totalAssetValue = calculateTotalAssetValue();
+    console.log("📌 최종 재산 합산 금액:", totalAssetValue.toLocaleString(), "원");
 
-    // ✅ 입력값 변환 (쉼표 제거 후 숫자 변환)
-    let totalInheritance = parseInt(inheritanceInput.value.replace(/,/g, "")) || 0;
-    if (totalInheritance <= 0) {
-        alert("총 상속 재산을 올바르게 입력하세요.");
-        return;
-    }
+    // ✅ 상속 비용 차감 후 최종 상속 금액 계산
+    let inheritanceCosts = parseFloat(window.totalDeductibleCost) || 0;
+    let adjustedAssetValue = Math.max(0, totalAssetValue - inheritanceCosts);
+    console.log("📌 비용 차감 후 최종 상속 금액:", adjustedAssetValue.toLocaleString(), "원");
+
+    // ✅ 모든 `.cashField` 값을 합산
+    let cashFields = document.querySelectorAll(".cashField");
+    let cashValue = Array.from(cashFields).reduce((sum, field) => {
+        let value = parseFloat(field.value.replace(/,/g, "")) || 0;
+        return sum + value;
+    }, 0);
+
+    // ✅ 모든 `.stockTotalField` 값을 합산
+    let stockFields = document.querySelectorAll(".stockTotalField");
+    let stockValue = Array.from(stockFields).reduce((sum, field) => {
+        let value = parseFloat(field.value.replace(/,/g, "")) || 0;
+        return sum + value;
+    }, 0);
+
+    // ✅ 디버그용 로그
+    console.log("📌 모든 입력된 현금 값 합계:", cashValue.toLocaleString(), "원");
+    console.log("📌 모든 입력된 주식 값 합계:", stockValue.toLocaleString(), "원");
+
+    let financialAssets = cashValue + stockValue;  // 금융 자산 합계
+    console.log("📌 최종 금융재산 합계:", financialAssets.toLocaleString(), "원");
+
+    // ✅ 금융재산 공제는 금융 자산(현금 + 주식)에 대해서만 적용 (최대 2억 원)
+    let financialExemption = Math.min(financialAssets * 0.2, 200000000);
+    console.log("📌 금융재산 공제 적용 가능 금액:", financialExemption.toLocaleString(), "원");
 
     // ✅ 특수 상속 유형 확인
     let otherAssetType = document.getElementById("otherAssetType");
-    let otherType = otherAssetType ? otherAssetType.value : null;
-    if (!otherType) {
+    if (!otherAssetType) {
         alert("올바른 특수상속 유형을 선택하세요.");
         return;
     }
-
+    let otherType = otherAssetType.value;
     console.log("📌 선택된 특수상속 유형:", otherType);
 
     // ✅ 공제 금액 및 메시지 초기화
@@ -1524,20 +1473,20 @@ function calculateSpecialInheritance() {
     // ✅ 특수 상속 유형별 공제 계산
     switch (otherType) {
         case "dwelling": // 동거주택 (최대 6억 공제)
-            deduction = Math.min(totalInheritance, 600000000);
-            policyMessage = "동거주택 상속 공제는 피상속인이 1세대 1주택자이며, 상속인은 상속 개시일(사망일)까지 10년 이상 동거하며 무주택자여야 하며, 상속 개시일(사망일) 이후 3년간 보유해야 합니다. (최대 6억 공제)";
+            deduction = Math.min(adjustedAssetValue, 600000000);
+            policyMessage = "동거주택 상속 공제는 피상속인이 1세대 1주택자이며, 상속인은 상속 개시일(사망일)까지 10년 이상 동거하며 무주택자여야 합니다.";
             eligibilityMessage = "✅ 10년 이상 동거 및 무주택 조건 충족";
             break;
 
         case "farming": // 농림재산 (최대 15억 공제)
-            deduction = Math.min(totalInheritance, 1500000000);
-            policyMessage = "농림재산 상속 공제는 피상속인이 10년 이상 직접 경작했어야 하며, 상속인은 상속 개시일(사망일)까지 10년 이상 함께 영농했어야 합니다. 상속 개시일 이후 3년 이상 영농을 지속해야 합니다. (최대 15억 공제)";
+            deduction = Math.min(adjustedAssetValue, 1500000000);
+            policyMessage = "농림재산 상속 공제는 피상속인이 10년 이상 직접 경작했어야 하며, 상속인은 상속 개시일(사망일)까지 10년 이상 함께 영농했어야 합니다.";
             eligibilityMessage = "✅ 10년 이상 자경 요건 충족";
             break;
 
         case "factory": // 공장 상속 (80% 공제, 최대 20억)
-            deduction = Math.min(totalInheritance * 0.8, 2000000000);
-            policyMessage = "공장 상속 공제는 피상속인이 10년 이상 직접 운영했어야 하며, 상속인은 상속 개시일(사망일) 이후 3년 이상 공장을 운영해야 합니다. (80% 또는 최대 20억 공제)";
+            deduction = Math.min(adjustedAssetValue * 0.8, 2000000000);
+            policyMessage = "공장 상속 공제는 피상속인이 10년 이상 직접 운영했어야 하며, 상속인은 상속 개시일 이후 3년 이상 공장을 운영해야 합니다.";
             eligibilityMessage = "✅ 10년 이상 공장 운영 요건 충족";
             break;
 
@@ -1546,32 +1495,35 @@ function calculateSpecialInheritance() {
             return;
     }
 
-    // ✅ 상속 비용 가져오기 (window.totalDeductibleCost 사용)
-    let inheritanceCosts = parseFloat(window.totalDeductibleCost) || 0;
-    console.log("📌 최종 상속 비용 (window.totalDeductibleCost):", inheritanceCosts.toLocaleString(), "원");
-  
-    // ✅ 과세 표준 및 상속세 계산
-    let taxableAmount = Math.max(0, totalInheritance - deduction - inheritanceCosts);
-    console.log("📌 과세 표준:", taxableAmount);
+   // ✅ 금융재산 공제 적용 후 자산 금액 계산
+   let assetAfterFinancialExemption = Math.max(0, adjustedAssetValue - financialExemption);
+   console.log("📌 금융재산 공제 후 자산 금액:", assetAfterFinancialExemption.toLocaleString(), "원");
 
-    // ✅ 공용 상속세 계산 함수 호출 (calculateProgressiveTax)
+   // ✅ 특수 상속 공제 적용 후 과세 표준 계산 (공제 가능한 금액만 적용)
+   let deductionApplied = assetAfterFinancialExemption > 0 ? deduction : 0;
+   let taxableAmount = Math.max(0, assetAfterFinancialExemption - deductionApplied);
+   console.log("📌 최종 과세 표준:", taxableAmount.toLocaleString(), "원");
+
     let inheritanceTax = taxableAmount > 0 ? calculateProgressiveTax(taxableAmount) : 0;
-    console.log("📌 최종 상속세 계산 완료:", inheritanceTax);
+    console.log("📌 최종 상속세 계산 완료:", inheritanceTax.toLocaleString(), "원");
 
-// ✅ 최종 결과 출력 (비용 차감 후 총 상속 재산으로 표시)
-document.getElementById("result").innerHTML = `
+    // ✅ 최종 결과 출력
+    document.getElementById("result").innerHTML = `
     <h3>특수상속 계산 결과</h3>
     <p>상속 유형: <strong>${otherAssetType.options[otherAssetType.selectedIndex].text}</strong></p>
-    <p>총 상속 재산 (비용 차감): <strong>${(totalInheritance - inheritanceCosts).toLocaleString()} 원</strong></p>
-    <p>공제 금액: <strong>${deduction.toLocaleString()} 원</strong></p>
+    <p>총 상속 재산 (비용 차감): <strong>${adjustedAssetValue.toLocaleString()} 원</strong></p>
+    <p>금융재산 공제: <strong>${financialExemption.toLocaleString()} 원</strong></p>
+    <p>특수 상속 공제: <strong>${deduction.toLocaleString()} 원</strong></p>
     <p>과세 표준: <strong>${taxableAmount.toLocaleString()} 원</strong></p>
     <p>최종 상속세: <strong>${inheritanceTax.toLocaleString()} 원</strong></p>
     <p style="color: blue; font-weight: bold;">ℹ️ ${policyMessage}</p>
-    <p style="color: green; font-weight: bold;">✅ 요건 충족 여부: ${eligibilityMessage}</p>
+    <p style="color: green; font-weight: bold;">${eligibilityMessage}</p>
  `;
 }
 
- // ✅ 상속 비용 모달   
+ /**
+ * ✅ 상속 비용 모달 
+ */    
  (function () {
     console.log("✅ 상속 비용 모달 스크립트 실행");
 
@@ -1703,13 +1655,15 @@ document.getElementById('calculateButton').addEventListener('click', () => {
      }
  });
     
-// 숫자 포맷 함수
+// ✅ 숫자 입력 필드에 콤마 추가 (ID 및 클래스 기반 적용)
 document.addEventListener('input', (event) => {
     const target = event.target;
-    const applicableFields = [
+
+    // 적용할 ID 목록
+    const applicableIds = [
         'cashAmount',
         'realEstateValue',
-        'stockQuantity',
+        'stockQuantity',       // 주식 수량 (콤마 적용)
         'stockPrice',
         'stockTotal',
         'mixedCashAmount',
@@ -1717,67 +1671,83 @@ document.addEventListener('input', (event) => {
         'mixedStockPrice'
     ];
 
-    if (applicableFields.includes(target.id)) {
-        const rawValue = target.value.replace(/[^0-9]/g, '');
-        target.value = rawValue ? parseInt(rawValue, 10).toLocaleString() : '';
-    }
-});
-
-// 숫자 입력 필드에 콤마 추가
-document.addEventListener('input', function (event) {
-    const target = event.target;
-
-    // 콤마 적용 대상 필드 ID
-    const applicableFields = [
-        'cashAmount',          // 현금
-        'realEstateValue',     // 부동산 평가액
-        'stockPrice',          // 주당 가격
-        'stockTotal',          // 주식 총액
-        'mixedCashAmount',     // 혼합 자산 현금
-        'mixedRealEstateValue',// 혼합 자산 부동산
-        'mixedStockPrice',     // 혼합 자산 주식
-        'fatherAmountInput',   // 아버지 금액
-        'motherAmountInput',   // 어머니 금액
-        'totalAssetValue',     // 추가된 필드
+    // 적용할 클래스 목록
+    const applicableClasses = [
+        'assetValue',          // 재산 가치 필드
+        'stockPriceField',     // 주식 가격 필드
+        'inheritanceCostField' // 상속 비용 필드
     ];
 
-    // 주식 수량은 제외 (콤마를 넣지 않음)
-    if (target.id === 'stockQuantity') {
-        return; // 콤마 처리 생략
-    }
-
-    // 해당 필드에 대해 콤마 적용
-    if (applicableFields.includes(target.id)) {
-        const rawValue = target.value.replace(/[^0-9]/g, ''); // 숫자 이외 문자 제거
+    // 해당 ID 또는 클래스가 적용 대상일 때 콤마 추가
+    if (
+        applicableIds.includes(target.id) || 
+        applicableClasses.some(className => target.classList.contains(className))
+    ) {
+        const rawValue = target.value.replace(/[^0-9]/g, ''); // 숫자만 남기기
         target.value = rawValue ? parseInt(rawValue, 10).toLocaleString() : ''; // 숫자에 콤마 추가
     }
 });
-     
-// 주식 총 금액 계산
-document.addEventListener('input', function () {
-    const stockQuantity = document.getElementById('stockQuantity');
-    const stockPrice = document.getElementById('stockPrice');
-    const stockTotal = document.getElementById('stockTotal');
+
+// ✅ 주식 총 금액을 계산하는 함수
+function calculateStockTotal(stockQuantityId, stockPriceId, stockTotalId) {
+    const stockQuantity = document.getElementById(stockQuantityId);
+    const stockPrice = document.getElementById(stockPriceId);
+    const stockTotal = document.getElementById(stockTotalId);
 
     if (stockQuantity && stockPrice && stockTotal) {
         const quantity = parseInt(stockQuantity.value.replace(/[^0-9]/g, '') || '0', 10);
         const price = parseInt(stockPrice.value.replace(/[^0-9]/g, '') || '0', 10);
-        stockTotal.value = (quantity * price).toLocaleString();
+        stockTotal.value = (quantity * price).toLocaleString(); // 총 금액 계산 및 콤마 추가
+    }
+}
+
+// ✅ 주식 및 혼합 자산 총액 계산
+document.addEventListener('input', () => {
+    calculateStockTotal('stockQuantity', 'stockPrice', 'stockTotal'); // 주식 필드 총액 계산
+    calculateStockTotal('mixedStockQuantity', 'mixedStockPrice', 'mixedTotalAmount'); // 혼합 자산 총액 계산
+});
+
+// ✅ 재산 추가 버튼 클릭 이벤트 (새 필드에 이벤트 등록)
+document.getElementById('addAssetButton').addEventListener('click', () => {
+    createAssetEntry();  // 새 재산 입력 필드 생성
+
+    // 새롭게 추가된 주식 관련 필드 가져오기
+    const newAssetEntry = document.querySelector('.asset-entry:last-child');
+    const newStockQuantity = newAssetEntry.querySelector('.stockQuantityField');
+    const newStockPrice = newAssetEntry.querySelector('.stockPriceField');
+    const newStockTotal = newAssetEntry.querySelector('.stockTotalField');
+
+    // 새 필드에도 자동 계산 이벤트 추가 (Element 기반)
+    if (newStockQuantity && newStockPrice && newStockTotal) {
+        newStockQuantity.addEventListener('input', () => {
+            calculateStockTotalByElement(newStockQuantity, newStockPrice, newStockTotal);
+        });
+        newStockPrice.addEventListener('input', () => {
+            calculateStockTotalByElement(newStockQuantity, newStockPrice, newStockTotal);
+        });
     }
 
-    const mixedStockQuantity = document.getElementById('mixedStockQuantity');
-    const mixedStockPrice = document.getElementById('mixedStockPrice');
-    const mixedTotalAmount = document.getElementById('mixedTotalAmount');
+    // 새롭게 추가된 필드에 콤마 적용 이벤트 등록
+    const newFields = newAssetEntry.querySelectorAll('.assetValue, .stockQuantityField, .stockPriceField');
+    newFields.forEach((field) => {
+        field.addEventListener('input', () => {
+            const numericValue = field.value.replace(/[^0-9]/g, '');
+            field.value = numericValue ? parseInt(numericValue, 10).toLocaleString() : '';
+        });
+    });
 
-    if (mixedStockQuantity && mixedStockPrice && mixedTotalAmount) {
-        const quantity = parseInt(mixedStockQuantity.value.replace(/[^0-9]/g, '') || '0', 10);
-        const price = parseInt(mixedStockPrice.value.replace(/[^0-9]/g, '') || '0', 10);
-        const total = quantity * price;
-        const cash = parseInt(document.getElementById('mixedCashAmount').value.replace(/[^0-9]/g, '') || '0', 10);
-        const realEstate = parseInt(document.getElementById('mixedRealEstateValue').value.replace(/[^0-9]/g, '') || '0', 10);
-
-        mixedTotalAmount.value = (total + cash + realEstate).toLocaleString();
+    // 새롭게 추가된 .assetType 필드에 이벤트 등록
+    const newAssetTypeSelect = newAssetEntry.querySelector('.assetType');
+    if (newAssetTypeSelect) {
+        newAssetTypeSelect.addEventListener('change', () => handleAssetTypeChange(newAssetTypeSelect));
     }
 });
-       
+
+// ✅ 주식 총 금액을 계산하는 함수 (Element 기반)
+function calculateStockTotalByElement(stockQuantityEl, stockPriceEl, stockTotalEl) {
+    const quantity = parseInt(stockQuantityEl.value.replace(/[^0-9]/g, '') || '0', 10);
+    const price = parseInt(stockPriceEl.value.replace(/[^0-9]/g, '') || '0', 10);
+    stockTotalEl.value = (quantity * price).toLocaleString(); // 총 금액 계산 및 콤마 추가
+ }
+
 }); // document.addEventListener 닫는 괄호 
