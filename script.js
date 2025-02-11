@@ -568,20 +568,23 @@ if (relationship === 'spouse') {
 // ✅ 최종 공제 계산 (변수 선언은 한 번만)
 let basicAndRelationshipExemption = basicExemption + relationshipExemption;
 
-// ✅ 기존에 선언된 generalExemptionAdjustment 변수를 재사용
-if (typeof generalExemptionAdjustment === 'undefined') {
-    generalExemptionAdjustment = 0;  // 초기화 (이미 선언된 경우 생략 가능)
-}
 
-if (relationship !== 'spouse') {
-    if (basicAndRelationshipExemption < 500000000) {
-        generalExemptionAdjustment = 500000000 - basicAndRelationshipExemption;  // 부족한 부분 보정
+// ✅ 최종 공제 계산 (배우자 추가 공제 포함)
+let totalExemption = 0;
+
+if (relationship === 'spouse') {
+    // 배우자: 금융재산 공제 + 관계 공제 + 배우자 추가 공제
+    totalExemption = financialExemption + relationshipExemption + spouseAdditionalExemption;
+} else {
+    // 배우자가 아닌 경우: 금융재산 공제 + 기초 공제 + 관계 공제 + 일괄공제 보정 (최소 7억 보장)
+    totalExemption = basicExemption + relationshipExemption + financialExemption;
+    if (totalExemption < 700000000) {
+        totalExemption = 700000000;
     }
 }
 
-// ✅ 최종 공제 금액 = 5억 (기초 + 관계 공제 보정) + 금융재산 공제
-let totalExemption = 500000000 + financialExemption;
-totalExemption = Math.min(totalExemption, totalAssetValue - inheritanceCosts); // 공제액이 상속 재산을 초과하지 않도록 제한
+// ✅ 상속 재산을 초과하는 공제 금액 제한
+totalExemption = Math.min(totalExemption, totalAssetValue - inheritanceCosts);
 
     // ✅ 과세 표준 계산
     const taxableAmount = Math.max(totalAssetValue - totalExemption, 0);
@@ -1521,10 +1524,10 @@ function calculateSpecialInheritance() {
  `;
 }
 
- /**
- * ✅ 상속 비용 모달 
- */    
- (function () {
+  /**
+* ✅ 상속 비용 모달 
+ */       
+(function () {
     console.log("✅ 상속 비용 모달 스크립트 실행");
 
     let openModalButton = document.getElementById("openModal");
@@ -1548,23 +1551,31 @@ function calculateSpecialInheritance() {
 
     // ✅ 모달 열기
     openModalButton.addEventListener("click", function () {
+        modal.classList.add("active");
+        overlay.classList.add("active");
+
+        // ✅ 강제로 스타일 적용 (호환성 보장)
         modal.style.display = "block";
         overlay.style.display = "block";
+
+        console.log("✅ 오버레이 및 모달 열기 시도");
     });
 
     // ✅ 모달 닫기
     function closeModal() {
+        modal.classList.remove("active");
+        overlay.classList.remove("active");
+
+        // ✅ 스타일 초기화
         modal.style.display = "none";
         overlay.style.display = "none";
+
+        console.log("✅ 모달 및 오버레이 비활성화");
     }
 
+    // ✅ 닫기 버튼 및 오버레이 클릭 시 모달 닫기
     closeModalButton.addEventListener("click", closeModal);
     overlay.addEventListener("click", closeModal);
-
-    // ✅ 입력값 포맷팅 함수 (숫자만 입력 가능)
-    function formatCurrency(value) {
-        return value.toLocaleString() + " 원";
-    }
 
     // ✅ 실시간 비용 합계 계산 함수
     function updateTotalCost() {
@@ -1576,7 +1587,7 @@ function calculateSpecialInheritance() {
         let totalCost = funeralCost + legalFees + unpaidTaxes + debt;
 
         // ✅ 실시간 합계 업데이트
-        modalCostSummary.textContent = `총 필요 경비: ${formatCurrency(totalCost)}`;
+        modalCostSummary.textContent = `총 필요 경비: ${totalCost.toLocaleString()} 원`;
     }
 
     // ✅ 입력값 변경 시 실시간 합계 업데이트
@@ -1597,7 +1608,7 @@ function calculateSpecialInheritance() {
         window.totalDeductibleCost = totalDeductibleCost || 0;
 
         // ✅ "총 상속 비용" 업데이트
-        costSummary.textContent = `총 상속 비용: ${formatCurrency(totalDeductibleCost)}`;
+        costSummary.textContent = `총 상속 비용: ${totalDeductibleCost.toLocaleString()} 원`;
 
         // ✅ 모달 닫기
         closeModal();
